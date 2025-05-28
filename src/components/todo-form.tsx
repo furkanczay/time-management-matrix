@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import categories from "@/data/categories.json";
 import { useTodos } from "@/hooks/use-todos";
-import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

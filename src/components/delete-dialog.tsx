@@ -32,7 +32,7 @@ export default function DeleteDialog({
     const deletedTodo = {
       id,
       todo,
-      completed: false,
+      completed,
       category,
     };
     deleteStorage(id);

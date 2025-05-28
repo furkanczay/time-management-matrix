@@ -5,10 +5,7 @@ import { Checkbox } from "./ui/checkbox";
 import DeleteDialog from "./delete-dialog";
 import { cn } from "@/lib/utils";
 import EditDialog from "./edit-dialog";
-import { toast } from "sonner";
 import { useState } from "react";
-import { Move, Plus } from "lucide-react";
-import { Button } from "./ui/button";
 import NewDialog from "./new-dialog";
 
 export default function Categories() {
