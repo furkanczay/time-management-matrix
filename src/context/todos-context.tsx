@@ -20,9 +20,12 @@ type TodosContextType = {
   deleteStorage: (id: string) => void;
   setCompleteTodo: (id: string, checked: boolean) => void;
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  moveTodo: (id: string, newCategory: string) => void;
 };
 
-export const TodosContext = createContext<TodosContextType | undefined>(undefined);
+export const TodosContext = createContext<TodosContextType | undefined>(
+  undefined
+);
 
 export function TodosProvider({ children }: { children: React.ReactNode }) {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -65,30 +68,45 @@ export function TodosProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteStorage = (id: string) => {
-    const updatedTodos = todos.filter(todo => todo.id !== id);
+    const updatedTodos = todos.filter((todo) => todo.id !== id);
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
-  }
+  };
 
   const setCompleteTodo = (id: string, checked: boolean) => {
-
-    const updatedTodos = todos.map(t => t.id === id
-          ? {
-              ...t,
-              completed: checked,
-            }
-          : t)
+    const updatedTodos = todos.map((t) =>
+      t.id === id
+        ? {
+            ...t,
+            completed: checked,
+          }
+        : t
+    );
 
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
+  };
 
-  }
+  const moveTodo = (id: string, newCategory: string) => {
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, category: newCategory } : todo
+    );
+    setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
+  };
 
   return (
-    <TodosContext.Provider value={{ todos, saveOrUpdate, setTodos, deleteStorage, setCompleteTodo }}>
+    <TodosContext.Provider
+      value={{
+        todos,
+        saveOrUpdate,
+        setTodos,
+        deleteStorage,
+        setCompleteTodo,
+        moveTodo,
+      }}
+    >
       {children}
     </TodosContext.Provider>
   );
 }
-
-
