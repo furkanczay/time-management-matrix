@@ -14,9 +14,6 @@ export default function Categories() {
   const [draggedTodoId, setDraggedTodoId] = useState<string | null>(null);
   const handleChangeChecked = (id: string, value: boolean) => {
     setCompleteTodo(id, value);
-    toast.success(
-      value ? "Todo marked as complete" : "Todo marked as uncomplete"
-    );
   };
 
   const handleDrop = (
@@ -81,7 +78,12 @@ export default function Categories() {
                       </div>
                       <div className="inline-flex items-center gap-2">
                         <EditDialog id={item.id} todo={item.todo} />
-                        <DeleteDialog id={item.id} todo={item.todo} />
+                        <DeleteDialog
+                          id={item.id}
+                          todo={item.todo}
+                          category={item.category}
+                          completed={item.completed}
+                        />
                       </div>
                     </li>
                   ))}

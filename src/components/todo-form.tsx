@@ -1,96 +1,115 @@
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import categories from "@/data/categories.json"
-import { useTodos } from '@/hooks/use-todos';
-import { toast } from 'sonner';
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { Input } from "@/components/ui/input";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-} from "@/components/ui/form"
-import { cn } from '@/lib/utils';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import categories from "@/data/categories.json";
+import { useTodos } from "@/hooks/use-todos";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 const formSchema = z.object({
-  todo: z.string().min(1, {
-    message: "Todo field is required"
-  }).max(50),
+  todo: z
+    .string()
+    .min(1, {
+      message: "Todo field is required",
+    })
+    .max(50),
   category: z.string().min(1, {
-    message: "Category field is required"
+    message: "Category field is required",
   }),
-  completed: z.boolean().optional()
-})
-export default function TodoForm({ id, onSuccess, }: {
-    id?: string;
-    onSuccess?: () => void;
-}){
-    const { todos } = useTodos();
-    const item = id ? todos.find(x => x.id === id) : undefined;
-    const form = useForm<z.infer<typeof formSchema>>({
+  completed: z.boolean().optional(),
+});
+export default function TodoForm({
+  id,
+  onSuccess,
+}: {
+  id?: string;
+  onSuccess?: () => void;
+}) {
+  const { todos } = useTodos();
+  const item = id ? todos.find((x) => x.id === id) : undefined;
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       todo: item?.todo ?? "",
       category: item?.category ?? "",
       completed: item?.completed ?? false,
     },
-  })
-    const { saveOrUpdate } = useTodos(); 
-    const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        saveOrUpdate({
-            id: id ?? undefined,
-            todo: values.todo,
-            category: values.category,
-            completed: values.completed
-        });
-        form.reset({
-            todo: "",
-            category: ""
-        });
-        form.setValue("category", "");
-        toast.success(id ? "Todo updated successfully" : "Todo added successfully");
-        if (onSuccess) onSuccess();
-    }
-    return(
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-                <div className={cn('flex items-center gap-2', id ? "flex-col" : "flex-row")}>
-                    <FormField
-                        control={form.control}
-                        name="todo"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormControl>
-                                <Input placeholder="Todo" {...field} />
-                            </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                            <FormItem>
-                            <Select key={field.value} onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Category" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {categories.map(cat => (
-                                        <SelectItem key={cat.id} value={String(cat.id)}>{cat.title}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            </FormItem>
-                        )}
-                    />
-                    <Button type='submit' variant={"outline"}>{id ? "Save Changes" : "+"}</Button>
-                </div>
-            </form>
-        </Form>
-    )
+  });
+  const { saveOrUpdate } = useTodos();
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    saveOrUpdate({
+      id: id ?? undefined,
+      todo: values.todo,
+      category: values.category,
+      completed: values.completed,
+    });
+    form.reset({
+      todo: "",
+      category: "",
+    });
+    form.setValue("category", "");
+    if (onSuccess) onSuccess();
+  };
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <div
+          className={cn(
+            "flex items-center gap-2",
+            id ? "flex-col" : "flex-row"
+          )}
+        >
+          <FormField
+            control={form.control}
+            name="todo"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Todo" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  key={field.value}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={String(cat.id)}>
+                        {cat.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+          <Button type="submit" variant={"outline"}>
+            {id ? "Save Changes" : "+"}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
 }
