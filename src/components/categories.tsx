@@ -7,7 +7,9 @@ import { cn } from "@/lib/utils";
 import EditDialog from "./edit-dialog";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Move } from "lucide-react";
+import { Move, Plus } from "lucide-react";
+import { Button } from "./ui/button";
+import NewDialog from "./new-dialog";
 
 export default function Categories() {
   const { todos, setCompleteTodo, moveTodo } = useTodos();
@@ -43,7 +45,7 @@ export default function Categories() {
             </CardHeader>
             <CardContent>
               {filteredTodos.length === 0 ? (
-                <div className="text-sm text-gray-500">No items found.</div>
+                <NewDialog catId={String(cat.id)} />
               ) : (
                 <ul className="space-y-3">
                   {filteredTodos.map((item) => (

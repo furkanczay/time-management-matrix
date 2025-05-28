@@ -30,8 +30,10 @@ const formSchema = z.object({
 export default function TodoForm({
   id,
   onSuccess,
+  initCategory,
 }: {
   id?: string;
+  initCategory?: string;
   onSuccess?: () => void;
 }) {
   const { todos } = useTodos();
@@ -40,7 +42,11 @@ export default function TodoForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       todo: item?.todo ?? "",
-      category: item?.category ?? "",
+      category: initCategory
+        ? initCategory
+        : item?.category
+        ? item.category
+        : "",
       completed: item?.completed ?? false,
     },
   });
@@ -79,12 +85,14 @@ export default function TodoForm({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="category"
             render={({ field }) => (
               <FormItem>
                 <Select
+                  disabled={!!initCategory}
                   key={field.value}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
@@ -105,8 +113,9 @@ export default function TodoForm({
               </FormItem>
             )}
           />
+
           <Button type="submit" variant={"outline"}>
-            {id ? "Save Changes" : "+"}
+            {id || initCategory ? "Save Changes" : "+"}
           </Button>
         </div>
       </form>
