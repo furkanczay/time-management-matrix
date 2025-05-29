@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 const formSchema = z.object({
   todo: z
     .string()
@@ -35,28 +36,40 @@ export default function TodoForm({
   initCategory?: string;
   onSuccess?: () => void;
 }) {
-  const { todos } = useTodos();
-  const item = id ? todos.find((x) => x.id === id) : undefined;
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      todo: item?.todo ?? "",
-      category: initCategory
-        ? initCategory
-        : item?.category
-        ? item.category
-        : "",
-      completed: item?.completed ?? false,
+      todo: "",
+      category: initCategory ? initCategory : "",
     },
   });
-  const { saveOrUpdate } = useTodos();
+  useEffect(() => {
+    if (id) {
+      async function getData() {
+        const data = await fetch(`http://localhost:3000/tasks/${id}`, {
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .catch((e) => console.log(e));
+        form.setValue("todo", data.title);
+        form.setValue("category", data.quadrant);
+      }
+      getData();
+    }
+  }, []);
+  const { saveTodo, updateTodo } = useTodos();
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    saveOrUpdate({
-      id: id ?? undefined,
-      todo: values.todo,
-      category: values.category,
-      completed: values.completed,
-    });
+    if (id) {
+      updateTodo(id, {
+        title: values.todo,
+        quadrant: values.category,
+      });
+    } else {
+      saveTodo({
+        title: values.todo,
+        quadrant: values.category,
+      });
+    }
     form.reset({
       todo: "",
       category: "",

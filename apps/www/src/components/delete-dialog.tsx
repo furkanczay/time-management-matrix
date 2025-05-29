@@ -25,15 +25,15 @@ export default function DeleteDialog({
   category: string;
   completed: boolean;
 }) {
-  const { deleteStorage, saveOrUpdate } = useTodos();
+  const { deleteStorage, saveTodo } = useTodos();
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
     const deletedTodo = {
       id,
-      todo,
-      completed,
-      category,
+      title: todo,
+      completed: completed,
+      quadrant: category,
     };
     deleteStorage(id);
     setOpen(false);
@@ -41,7 +41,7 @@ export default function DeleteDialog({
       action: {
         label: "Undo",
         onClick: () => {
-          saveOrUpdate(deletedTodo);
+          saveTodo(deletedTodo);
           toast.success("Todo restored");
         },
       },
