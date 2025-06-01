@@ -9,28 +9,28 @@ datasource db {
 }
 
 model Subtask {
-  id        String   @id
+  id        String   @id @default(uuid())
   title     String
   parentId  String
   completed Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   Task      Task     @relation(fields: [parentId], references: [id], onDelete: Cascade)
 }
 
 model Task {
-  id                           String    @id
+  id                           String    @id @default(uuid())
   title                        String
   description                  String?
   quadrant                     Quadrant
   assignedToId                 String?
   createdAt                    DateTime  @default(now())
-  updatedAt                    DateTime
+  updatedAt                    DateTime @updatedAt
   completed                    Boolean   @default(false)
   creatorId                    String
   creator                      User @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: Cascade)
   assignedTo User? @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
-  Subtask                      Subtask[]
+  subtasks                      Subtask[]
 }
 
 model Account {
