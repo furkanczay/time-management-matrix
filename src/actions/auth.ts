@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { APIError } from "better-auth";
+import { redirect } from "next/navigation";
 
 type AuthFormState = {
   error: string | null;
@@ -21,15 +22,12 @@ export async function loginAction(
         password: password,
       },
     });
-
-    return {
-      error: null,
-    };
   } catch (e) {
     return {
       error: (e as APIError)?.message,
     };
   }
+  redirect("/");
 }
 
 export async function registerAction(
@@ -48,13 +46,11 @@ export async function registerAction(
         name: name,
       },
     });
-
-    return {
-      error: null,
-    };
   } catch (e) {
     return {
       error: (e as APIError)?.message,
     };
   }
+
+  redirect("/");
 }

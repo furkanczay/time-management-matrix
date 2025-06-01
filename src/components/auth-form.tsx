@@ -5,14 +5,18 @@ import { Input } from "./ui/input";
 import { toast } from "sonner";
 import { loginAction, registerAction } from "@/actions/auth";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
+  const router = useRouter();
   const [state, action, isPending] = useActionState(
     mode === "login" ? loginAction : registerAction,
     { error: null }
   );
   useEffect(() => {
     if (state?.error) {
+      console.log(state.error);
+
       toast.error(state?.error);
     }
   }, [state?.error]);

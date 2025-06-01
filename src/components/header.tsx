@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/session";
+import SignoutButton from "./signout-button";
 
 export default async function Header() {
   const session = await getSession();
@@ -10,6 +11,7 @@ export default async function Header() {
       {session && (
         <div className="inline-flex items-center gap-2">
           <span>{session.user.name}</span>
+          <SignoutButton />
         </div>
       )}
     </div>
