@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Subtask {
+  id        String   @id
+  title     String
+  parentId  String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Task      Task     @relation(fields: [parentId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id                           String    @id
+  title                        String
+  description                  String?
+  quadrant                     Quadrant
+  assignedToId                 String?
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime
+  completed                    Boolean   @default(false)
+  creatorId                    String
+  creator                      User @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: Cascade)
+  assignedTo User? @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
+  Subtask                      Subtask[]
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model User {
+  id                           String    @id
+  name                         String
+  email                        String    @unique
+  emailVerified                Boolean
+  image                        String?
+  createdAt                    DateTime
+  updatedAt                    DateTime
+  account                      Account[]
+  session                      Session[]
+  createdTasks Task[] @relation("CreatedTasks")
+  assignedTasks Task[] @relation("AssignedTasks")
+  @@map("user")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+  @@map("verification")
+}
+
+enum Quadrant {
+  IMPORTANT_URGENT
+  IMPORTANT_NOT_URGENT
+  NOT_IMPORTANT_URGENT
+  NOT_IMPORTANT_NOT_URGENT
+}
