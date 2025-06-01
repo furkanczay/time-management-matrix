@@ -2,17 +2,23 @@
 
 import { auth } from "@/lib/auth";
 import { APIError } from "better-auth";
-import { NextResponse } from "next/server";
 
-export async function loginAction(prevState: any, formData: FormData) {
-  const email = formData.get("email");
-  const password = formData.get("password");
+type AuthFormState = {
+  error: string | null;
+};
+
+export async function loginAction(
+  prevState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
   try {
     await auth.api.signInEmail({
       body: {
-        email: email as string,
-        password: password as string,
+        email: email,
+        password: password,
       },
     });
 
@@ -26,17 +32,20 @@ export async function loginAction(prevState: any, formData: FormData) {
   }
 }
 
-export async function registerAction(prevState: any, formData: FormData) {
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const name = formData.get("name");
+export async function registerAction(
+  prevState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const name = formData.get("name") as string;
 
   try {
     await auth.api.signUpEmail({
       body: {
-        email: email as string,
-        password: password as string,
-        name: name as string,
+        email: email,
+        password: password,
+        name: name,
       },
     });
 

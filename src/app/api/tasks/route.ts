@@ -1,11 +1,10 @@
 import { Quadrant } from "@/generated/prisma";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { createTaskSchema } from "@/lib/validations";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const session = await getSession();
   if (!session) {
     return NextResponse.json(

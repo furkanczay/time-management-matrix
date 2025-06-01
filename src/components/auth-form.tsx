@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [state, action, isPending] = useActionState(
     mode === "login" ? loginAction : registerAction,
-    undefined
+    { error: null }
   );
   useEffect(() => {
     if (state?.error) {

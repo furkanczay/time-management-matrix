@@ -1,6 +1,5 @@
 "use client";
 import Categories from "@/components/categories";
-import Header from "@/components/header";
 import TodoForm from "@/components/todo/todo-form";
 import { Button } from "@/components/ui/button";
 import { Grid, List } from "lucide-react";
