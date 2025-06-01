@@ -5,7 +5,6 @@ import { Input } from "./ui/input";
 import { toast } from "sonner";
 import { loginAction, registerAction } from "@/actions/auth";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [state, action, isPending] = useActionState(
