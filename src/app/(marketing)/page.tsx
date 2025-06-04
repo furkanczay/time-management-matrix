@@ -1,16 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   ClockIcon,
   CheckCircle2Icon,
   ZapIcon,
   BarChart3Icon,
-  ArrowRightIcon,
   HomeIcon,
-  InfoIcon,
   PhoneIcon,
 } from "lucide-react";
 import { ModernNavbar } from "@/components/ui/modern-navbar";
@@ -562,7 +559,7 @@ export default function Home() {
               <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 to-purple-500/50 rounded-full blur-sm"></div>
             </h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed leading-relaxed">
-              Don't just take our word for it. See how Time Matrix has
+              Don&apos;t just take our word for it. See how Time Matrix has
               transformed productivity for our users and helped them achieve
               more.
             </p>
@@ -632,13 +629,13 @@ export default function Home() {
                 {/* Testimonial text with enhanced styling */}
                 <blockquote className="text-muted-foreground italic relative text-base leading-relaxed">
                   <span className="text-4xl absolute -top-3 -left-2 text-primary/20 font-serif">
-                    "
+                    &ldquo;
                   </span>
-                  Time Matrix has completely changed how I prioritize tasks. I'm
-                  now much more focused on what truly matters and my team's
-                  productivity has increased by 37%.
+                  Time Matrix has completely changed how I prioritize tasks.
+                  I&apos;m now much more focused on what truly matters and my
+                  team&apos;s productivity has increased by 37%.
                   <span className="text-4xl absolute -bottom-6 -right-2 text-primary/20 font-serif">
-                    "
+                    &rdquo;
                   </span>
                 </blockquote>
 
@@ -726,13 +723,13 @@ export default function Home() {
                 {/* Testimonial text with enhanced styling */}
                 <blockquote className="text-muted-foreground italic relative text-base leading-relaxed">
                   <span className="text-4xl absolute -top-3 -left-2 text-blue-500/20 font-serif">
-                    "
+                    &ldquo;
                   </span>
                   The visual matrix makes it so easy to see where I should focus
-                  my energy. My productivity has improved dramatically and I've
-                  reclaimed about 10 hours each week.
+                  my energy. My productivity has improved dramatically and
+                  I&apos;ve reclaimed about 10 hours each week.
                   <span className="text-4xl absolute -bottom-6 -right-2 text-blue-500/20 font-serif">
-                    "
+                    &rdquo;
                   </span>
                 </blockquote>
 
@@ -820,13 +817,13 @@ export default function Home() {
                 {/* Testimonial text with enhanced styling */}
                 <blockquote className="text-muted-foreground italic relative text-base leading-relaxed">
                   <span className="text-4xl absolute -top-3 -left-2 text-purple-500/20 font-serif">
-                    "
+                    &ldquo;
                   </span>
                   I love how I can quickly reorganize tasks as priorities shift.
                   The drag-and-drop interface is intuitive and efficient.
                   Perfect for our agile development workflow.
                   <span className="text-4xl absolute -bottom-6 -right-2 text-purple-500/20 font-serif">
-                    "
+                    &rdquo;
                   </span>
                 </blockquote>
 

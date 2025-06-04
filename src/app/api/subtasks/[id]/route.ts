@@ -53,3 +53,49 @@ export async function PUT(
 
   return NextResponse.json(subtask);
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      { status: 403 }
+    );
+  }
+
+  const { id } = await params;
+
+  // Check if subtask exists and user has permission
+  const exist = await prisma.subtask.findFirst({
+    where: {
+      AND: [
+        { id },
+        {
+          Task: {
+            creatorId: session?.user.id,
+          },
+        },
+      ],
+    },
+  });
+
+  if (!exist) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  try {
+    await prisma.subtask.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "Subtask deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: "An error occurred" }, { status: 500 });
+  }
+}

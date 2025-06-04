@@ -115,10 +115,8 @@ export async function getTodos(params: GetTodosParams = {}) {
           lte: endOfDay,
         },
       };
-    }
-
-    // Build orderBy based on sortBy parameter
-    let orderByClause: any = [];
+    } // Build orderBy based on sortBy parameter
+    const orderByClause: Array<Record<string, "asc" | "desc">> = [];
 
     // Always sort by completion status first (incomplete tasks first)
     orderByClause.push({ completed: "asc" });
@@ -137,7 +135,6 @@ export async function getTodos(params: GetTodosParams = {}) {
     if (sortBy !== "createdAt") {
       orderByClause.push({ createdAt: "desc" });
     }
-
     const todos = await db.task.findMany({
       where: {
         AND: [
@@ -157,15 +154,20 @@ export async function getTodos(params: GetTodosParams = {}) {
             : {},
         ],
       },
+      include: {
+        subtasks: true, // Include subtasks in the response
+      },
       orderBy: orderByClause,
       take: limit,
       skip: offset,
-    });
-
-    // Add isCompleted field to each todo
+    }); // Add isCompleted field to each todo and its subtasks
     const todosWithIsCompleted = todos.map((todo) => ({
       ...todo,
       isCompleted: todo.completed,
+      subtasks: todo.subtasks.map((subtask) => ({
+        ...subtask,
+        isCompleted: subtask.completed,
+      })),
     }));
 
     return todosWithIsCompleted;
@@ -231,10 +233,18 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
     const session = await getSession();
     if (!session || !session.user) {
       throw new Error("Unauthorized: No session found");
-    }
-
-    // Prepare update data
-    const updateData: any = {
+    } // Prepare update data
+    const updateData: {
+      updatedAt: Date;
+      title?: string;
+      description?: string;
+      completed?: boolean;
+      isUrgent?: boolean;
+      isImportant?: boolean;
+      dueDate?: Date | null;
+      category?: string;
+      order?: number;
+    } = {
       updatedAt: new Date(),
     }; // Add individual fields if provided
     if (data.title !== undefined) updateData.title = data.title;

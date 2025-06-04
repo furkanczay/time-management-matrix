@@ -14,7 +14,7 @@ import { useState } from "react";
 import { TodoItem } from "@/contexts/todo-context";
 
 export default function EditDialog({
-  id,
+  id: _id,
   todo,
 }: {
   id: string;
@@ -32,7 +32,9 @@ export default function EditDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
-          <DialogDescription>Make changes to "{todo.title}"</DialogDescription>
+          <DialogDescription>
+            Make changes to &ldquo;{todo.title}&rdquo;
+          </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <TodoForm todo={todo} onSuccess={() => setOpen(false)} />

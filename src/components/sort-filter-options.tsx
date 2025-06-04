@@ -2,7 +2,7 @@
 
 import { CalendarIcon, SortAsc, SortDesc } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import {
   Select,
@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 
 interface SortFilterOptionsProps {
-  currentView: "matrix" | "list";
   currentSortBy?: string;
   currentSortOrder?: string;
   currentFilterDate?: string;
@@ -26,7 +25,6 @@ interface SortFilterOptionsProps {
 }
 
 export default function SortFilterOptions({
-  currentView,
   currentSortBy = "order",
   currentSortOrder = "asc",
   currentFilterDate,
@@ -164,7 +162,7 @@ export default function SortFilterOptions({
           onClick={handleTodayToggle}
           className="whitespace-nowrap"
         >
-          Today's Tasks
+          Today&apos;s Tasks
         </Button>
 
         {hasActiveFilters && (

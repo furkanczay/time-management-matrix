@@ -4,12 +4,15 @@ import { createTodo, getTodos } from "@/lib/api/todos";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-
     const params = {
       search: searchParams.get("search") || undefined,
       category: searchParams.get("category") || undefined,
-      priority: (searchParams.get("priority") as any) || undefined,
-      status: (searchParams.get("status") as any) || undefined,
+      priority:
+        (searchParams.get("priority") as "high" | "medium" | "low" | null) ||
+        undefined,
+      status:
+        (searchParams.get("status") as "pending" | "completed" | null) ||
+        undefined,
       limit: Number(searchParams.get("limit")) || 50,
       offset: Number(searchParams.get("offset")) || 0,
       sortBy:

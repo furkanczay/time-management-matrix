@@ -12,7 +12,13 @@ export async function fetchTodos(params?: Record<string, string>) {
   return response.json();
 }
 
-export async function createTodoAPI(data: any) {
+export async function createTodoAPI(data: {
+  title: string;
+  description?: string | null;
+  dueDate?: string | null;
+  isUrgent?: boolean;
+  isImportant?: boolean;
+}) {
   const response = await fetch(API_BASE, {
     method: "POST",
     headers: {
@@ -24,7 +30,18 @@ export async function createTodoAPI(data: any) {
   return response.json();
 }
 
-export async function updateTodoAPI(id: string, data: any) {
+export async function updateTodoAPI(
+  id: string,
+  data: {
+    title?: string;
+    description?: string | null;
+    dueDate?: string | null;
+    isUrgent?: boolean;
+    isImportant?: boolean;
+    completed?: boolean;
+    order?: number;
+  }
+) {
   const response = await fetch(`${API_BASE}/${id}`, {
     method: "PUT",
     headers: {

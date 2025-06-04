@@ -35,7 +35,6 @@ export default async function DashboardPage({
         </div>
         <div className="space-y-4">
           <SortFilterOptions
-            currentView={currentView}
             currentSortBy={currentSortBy}
             currentSortOrder={currentSortOrder}
             currentFilterDate={filterDate}

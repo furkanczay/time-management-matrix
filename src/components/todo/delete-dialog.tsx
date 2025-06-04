@@ -54,16 +54,15 @@ export default function DeleteDialog({
                 title: deletedTodo.title,
                 isUrgent: deletedTodo.isUrgent,
                 isImportant: deletedTodo.isImportant,
-                isCompleted: deletedTodo.completed,
               });
               toast.success("Todo restored");
-            } catch (error) {
+            } catch (_error) {
               toast.error("Failed to restore todo");
             }
           },
         },
       });
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete todo");
     }
   };

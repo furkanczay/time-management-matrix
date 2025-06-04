@@ -25,8 +25,6 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-import { Task } from "@/generated/prisma";
 import { useTodos, TodoItem, calculateQuadrant } from "@/contexts/todo-context";
 import { toast } from "sonner";
 import { CalendarIcon } from "lucide-react";
@@ -81,13 +79,12 @@ export default function TodoForm({
       // Parse category to get isUrgent and isImportant values
       const isUrgent = values.category === "1" || values.category === "3";
       const isImportant = values.category === "1" || values.category === "2";
-
       if (todo?.id) {
         await updateTodo(todo.id, {
           title: values.todo,
           isUrgent,
           isImportant,
-          dueDate: values.dueDate,
+          dueDate: values.dueDate ? values.dueDate.toISOString() : null,
         });
         toast.success("Todo updated successfully!");
       } else {
@@ -95,7 +92,7 @@ export default function TodoForm({
           title: values.todo,
           isUrgent,
           isImportant,
-          dueDate: values.dueDate,
+          dueDate: values.dueDate ? values.dueDate.toISOString() : null,
         });
         toast.success("Todo created successfully!");
       }
@@ -107,7 +104,7 @@ export default function TodoForm({
       });
 
       if (onSuccess) onSuccess();
-    } catch (error) {
+    } catch (_error) {
       toast.error("An error occurred. Please try again.");
     }
   };

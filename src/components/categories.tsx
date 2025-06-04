@@ -3,7 +3,7 @@ import { useTodos, calculateQuadrant } from "@/contexts/todo-context";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import SingleTodo from "./todo/single-todo";
 import NewDialog from "./todo/new-dialog";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
-import { format, isToday, parseISO } from "date-fns";
+import { isToday } from "date-fns";
 
 interface CategoriesProps {
   show: "matrix" | "list";

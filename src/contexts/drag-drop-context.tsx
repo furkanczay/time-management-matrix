@@ -12,10 +12,6 @@ import {
   DragOverlay,
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import { ReactNode, useState } from "react";
 import { useTodos, TodoItem, calculateQuadrant } from "./todo-context";
 import SingleTodo from "@/components/todo/single-todo";
@@ -27,7 +23,7 @@ interface DragDropProviderProps {
 
 export function DragDropProvider({ children }: DragDropProviderProps) {
   const { todos, updateTodo, refreshTodos } = useTodos();
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [_activeId, setActiveId] = useState<string | null>(null);
   const [activeItem, setActiveItem] = useState<TodoItem | null>(null);
 
   const sensors = useSensors(
@@ -46,8 +42,7 @@ export function DragDropProvider({ children }: DragDropProviderProps) {
     const activeTodo = todos.find((todo) => todo.id === active.id);
     setActiveItem(activeTodo || null);
   };
-
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = (_event: DragOverEvent) => {
     // This will be used for real-time visual feedback
     // We'll implement this if needed for better UX
   };

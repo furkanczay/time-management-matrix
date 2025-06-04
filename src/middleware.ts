@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-const guestUrls = ["/login"];
 const protectedUrls = ["/dashboard", "/profile", "/settings"];
 
 export async function middleware(request: NextRequest) {

@@ -5,10 +5,8 @@ import AuthForm from "@/components/auth-form";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import SocialAuthButtons from "@/components/social-auth-buttons";
 import Image from "next/image";

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
@@ -16,7 +16,7 @@ function calculateQuadrant(isUrgent: boolean, isImportant: boolean): string {
   return "4"; // Neither Urgent nor Important
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const session = await getSession();
     if (!session) {
@@ -49,10 +49,8 @@ export async function POST(request: NextRequest) {
     tasks.forEach((task) => {
       const quadrant = calculateQuadrant(task.isUrgent, task.isImportant);
       tasksByQuadrant[quadrant].push(task);
-    });
-
-    // Update order values for each quadrant
-    const updatePromises: Promise<any>[] = [];
+    }); // Update order values for each quadrant
+    const updatePromises: Promise<{ id: string; order: number }>[] = [];
 
     Object.entries(tasksByQuadrant).forEach(([quadrant, quadrantTasks]) => {
       console.log(

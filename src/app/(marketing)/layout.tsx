@@ -1,4 +1,3 @@
-import Header from "@/components/header";
 import { Toaster } from "sonner";
 
 export default function MainLayout({

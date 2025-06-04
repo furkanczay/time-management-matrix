@@ -78,7 +78,7 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
     try {
       await toggleComplete(id);
       toast.success(value ? "Task completed!" : "Task marked as pending");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update task");
     }
   };
@@ -112,27 +112,45 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
           onCheckedChange={(value) => handleChangeChecked(todo.id, !!value)}
           id={`checkbox-${todo.id}`}
         />{" "}
-        <TodoDetail
-          todo={todo}
-          triggerClassname={cn(
-            "text-sm font-medium leading-none hover:underline cursor-pointer",
-            isCompleted ? "line-through text-muted-foreground" : ""
-          )}
-        />{" "}
-        {todo.dueDate && (
-          <div
-            className={cn(
-              "flex items-center gap-1 text-xs",
-              dueDateUrgency?.dateClass || "text-muted-foreground"
+        <div className="flex flex-col items-start gap-1 flex-1">
+          <TodoDetail
+            todo={todo}
+            triggerClassname={cn(
+              "text-sm font-medium leading-none hover:underline cursor-pointer",
+              isCompleted ? "line-through text-muted-foreground" : ""
             )}
-          >
-            <Calendar className="h-3 w-3" />
-            <span>
-              {dueDateUrgency?.prefix}
-              {format(new Date(todo.dueDate), "MMM dd")}
-            </span>
-          </div>
-        )}
+          />
+        </div>{" "}
+        <div className="flex items-center gap-2">
+          {todo.subtasks && todo.subtasks.length > 0 && (
+            <div
+              className={cn(
+                "text-xs px-2 py-1 rounded-full",
+                todo.subtasks.filter((subtask) => subtask.isCompleted)
+                  .length === todo.subtasks.length
+                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              {todo.subtasks.filter((subtask) => subtask.isCompleted).length}/
+              {todo.subtasks.length}
+            </div>
+          )}
+          {todo.dueDate && (
+            <div
+              className={cn(
+                "flex items-center gap-1 text-xs",
+                dueDateUrgency?.dateClass || "text-muted-foreground"
+              )}
+            >
+              <Calendar className="h-3 w-3" />
+              <span>
+                {dueDateUrgency?.prefix}
+                {format(new Date(todo.dueDate), "MMM dd")}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <EditDialog id={todo.id} todo={todo} />

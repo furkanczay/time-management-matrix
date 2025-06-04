@@ -14,7 +14,7 @@ export function BackgroundCells({
   containerClassName,
   patternClassName,
 }: BackgroundCellProps) {
-  const [isHovering, setIsHovering] = useState(false);
+  const [_isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
