@@ -8,14 +8,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import categories from "@/data/categories.json";
-import { useTodos } from "@/hooks/use-todos";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
+import { Task } from "@/generated/prisma";
+import { useTodos, TodoItem, calculateQuadrant } from "@/contexts/todo-context";
+import { toast } from "sonner";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+
+// Quadrant options for the form
+const QUADRANT_OPTIONS = [
+  { id: "1", title: "Important & Urgent" },
+  { id: "2", title: "Important & Not Urgent" },
+  { id: "3", title: "Not Important & Urgent" },
+  { id: "4", title: "Not Important & Not Urgent" },
+];
+
 const formSchema = z.object({
   todo: z
     .string()
@@ -26,84 +50,96 @@ const formSchema = z.object({
   category: z.string().min(1, {
     message: "Category field is required",
   }),
+  dueDate: z.date().optional(),
   completed: z.boolean().optional(),
 });
 export default function TodoForm({
-  id,
+  todo,
   onSuccess,
   initCategory,
 }: {
-  id?: string;
+  todo?: TodoItem;
   initCategory?: string;
   onSuccess?: () => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      todo: "",
-      category: initCategory ? initCategory : "",
+      todo: todo?.title ? todo.title : "",
+      completed: todo?.isCompleted ? todo.isCompleted : false,
+      category: initCategory
+        ? initCategory
+        : todo
+        ? calculateQuadrant(todo.isUrgent, todo.isImportant)
+        : "",
+      dueDate: todo?.dueDate ? new Date(todo.dueDate) : undefined,
     },
   });
-  useEffect(() => {
-    if (id) {
-      async function getData() {
-        const data = await fetch(`/api/tasks/${id}`, {
-          credentials: "include",
-        })
-          .then((res) => res.json())
-          .catch((e) => console.log(e));
-        form.setValue("todo", data.title);
-        form.setValue("category", data.quadrant);
+  const { createTodo, updateTodo } = useTodos();
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      // Parse category to get isUrgent and isImportant values
+      const isUrgent = values.category === "1" || values.category === "3";
+      const isImportant = values.category === "1" || values.category === "2";
+
+      if (todo?.id) {
+        await updateTodo(todo.id, {
+          title: values.todo,
+          isUrgent,
+          isImportant,
+          dueDate: values.dueDate,
+        });
+        toast.success("Todo updated successfully!");
+      } else {
+        await createTodo({
+          title: values.todo,
+          isUrgent,
+          isImportant,
+          dueDate: values.dueDate,
+        });
+        toast.success("Todo created successfully!");
       }
-      getData();
-    }
-  }, []);
-  const { saveTodo, updateTodo } = useTodos();
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    if (id) {
-      updateTodo(id, {
-        title: values.todo,
-        quadrant: values.category,
+
+      form.reset({
+        todo: "",
+        category: initCategory || "",
+        dueDate: undefined,
       });
-    } else {
-      saveTodo({
-        title: values.todo,
-        quadrant: values.category,
-      });
+
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
     }
-    form.reset({
-      todo: "",
-      category: "",
-    });
-    form.setValue("category", "");
-    if (onSuccess) onSuccess();
   };
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Todo Input */}
+        <FormField
+          control={form.control}
+          name="todo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Task Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter your task..." {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        {/* Category and Due Date in row for new todos, column for edit */}
         <div
           className={cn(
-            "flex items-center gap-2",
-            id ? "flex-col" : "flex-row"
+            "grid gap-4",
+            todo?.id ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
           )}
         >
-          <FormField
-            control={form.control}
-            name="todo"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Todo" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
           <FormField
             control={form.control}
             name="category"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Category</FormLabel>
                 <Select
                   disabled={!!initCategory}
                   key={field.value}
@@ -116,19 +152,74 @@ export default function TodoForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={String(cat.id)}>
-                        {cat.title}
+                    {QUADRANT_OPTIONS.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.title}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormItem>
             )}
+          />{" "}
+          <FormField
+            control={form.control}
+            name="dueDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Due Date (Optional)</FormLabel>
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "flex-1 pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a due date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {field.value && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => field.onChange(undefined)}
+                      className="px-3"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </FormItem>
+            )}
           />
-
-          <Button type="submit" variant={"outline"}>
-            {id || initCategory ? "Save Changes" : "+"}
+        </div>{" "}
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <Button type="submit" className="w-full md:w-auto">
+            {todo?.id ? "Update Task" : "Create Task"}
           </Button>
         </div>
       </form>

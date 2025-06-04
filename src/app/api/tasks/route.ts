@@ -1,60 +1,78 @@
-import { Quadrant } from "@/generated/prisma";
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
-import { createTaskSchema } from "@/lib/validations";
 import { NextRequest, NextResponse } from "next/server";
+import { createTodo, getTodos } from "@/lib/api/todos";
 
-export async function GET() {
-  const session = await getSession();
-  if (!session) {
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+
+    const params = {
+      search: searchParams.get("search") || undefined,
+      category: searchParams.get("category") || undefined,
+      priority: (searchParams.get("priority") as any) || undefined,
+      status: (searchParams.get("status") as any) || undefined,
+      limit: Number(searchParams.get("limit")) || 50,
+      offset: Number(searchParams.get("offset")) || 0,
+      sortBy:
+        (searchParams.get("sortBy") as "order" | "dueDate" | "createdAt") ||
+        undefined,
+      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || undefined,
+      filterToday: searchParams.get("filterToday") === "true",
+    };
+
+    const todos = await getTodos(params);
+
+    return NextResponse.json({
+      success: true,
+      data: todos,
+      count: todos.length,
+    });
+  } catch (error) {
+    console.error("Error fetching todos:", error);
     return NextResponse.json(
-      {
-        message: "Unauthorized",
-      },
-      { status: 403 }
+      { success: false, error: "Internal server error" },
+      { status: 500 }
     );
   }
-  const tasks = await prisma.task.findMany({
-    include: { subtasks: true },
-    where: { creatorId: session?.user.id },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-  return NextResponse.json(tasks);
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const parse = createTaskSchema.safeParse(body);
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json(
-      {
-        message: "Unauthorized",
-      },
-      { status: 403 }
-    );
-  }
-  if (!parse.success) {
-    return NextResponse.json({ error: parse.error.format() }, { status: 400 });
-  }
+  try {
+    const body = await request.json();
 
-  const { title, description, quadrant, completed } = parse.data;
+    const { title, description, isUrgent, isImportant, isCompleted, dueDate } =
+      body;
 
-  const task = await prisma.task.create({
-    data: {
+    if (!title || isUrgent === undefined || isImportant === undefined) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Title, isUrgent, and isImportant are required",
+        },
+        { status: 400 }
+      );
+    }
+
+    const todo = await createTodo({
       title,
       description,
-      quadrant: quadrant as Quadrant,
-      completed: completed ?? false,
-      creator: {
-        connect: {
-          id: session?.user.id,
-        },
-      },
-    },
-  });
+      isUrgent: Boolean(isUrgent),
+      isImportant: Boolean(isImportant),
+      isCompleted: Boolean(isCompleted),
+      dueDate: dueDate ? new Date(dueDate) : null,
+    });
 
-  return NextResponse.json(task);
+    return NextResponse.json(
+      {
+        success: true,
+        data: todo,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error creating todo:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to create todo" },
+      { status: 500 }
+    );
+  }
 }

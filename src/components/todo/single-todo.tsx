@@ -1,67 +1,146 @@
-import { GripVertical } from "lucide-react";
+"use client";
+import { GripVertical, Calendar } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import DeleteDialog from "./delete-dialog";
 import { cn } from "@/lib/utils";
 import EditDialog from "./edit-dialog";
-import { useTodos } from "@/hooks/use-todos";
 import { Card } from "@/components/ui/card";
 import TodoDetail from "./todo-detail";
+import { useTodos, TodoItem, calculateQuadrant } from "@/contexts/todo-context";
+import { toast } from "sonner";
+import { format, differenceInDays } from "date-fns";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-export default function SingleTodo({
-  id,
-  draggedTodoId,
-  setDraggedTodoId,
-}: {
-  id: string;
-  draggedTodoId?: string | null;
-  setDraggedTodoId?: (id?: string | null) => void;
-}) {
-  const { setCompleteTodo, todos } = useTodos();
-  const todoItem = todos.find((t) => t.id === id);
-  const handleChangeChecked = (id: string, value: boolean) => {
-    setCompleteTodo(id, value);
+// Helper function to get due date urgency styling
+const getDueDateUrgency = (dueDate: Date | null | string) => {
+  if (!dueDate) return null;
+
+  const today = new Date();
+  const due = new Date(dueDate);
+  const daysUntilDue = differenceInDays(due, today);
+
+  if (daysUntilDue < 0) {
+    // Overdue - red background
+    return {
+      cardClass: "border-red-500 bg-red-50 dark:bg-red-950/20",
+      dateClass: "text-red-600 dark:text-red-400 font-medium",
+      prefix: "Overdue: ",
+    };
+  } else if (daysUntilDue === 0) {
+    // Due today - red background
+    return {
+      cardClass: "border-red-500 bg-red-50 dark:bg-red-950/20",
+      dateClass: "text-red-600 dark:text-red-400 font-medium",
+      prefix: "Due today: ",
+    };
+  } else if (daysUntilDue === 1) {
+    // Due tomorrow - red background
+    return {
+      cardClass: "border-red-500 bg-red-50 dark:bg-red-950/20",
+      dateClass: "text-red-600 dark:text-red-400 font-medium",
+      prefix: "Due tomorrow: ",
+    };
+  } else if (daysUntilDue <= 3) {
+    // Due in 2-3 days - yellow background
+    return {
+      cardClass: "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20",
+      dateClass: "text-yellow-600 dark:text-yellow-400 font-medium",
+      prefix: `Due in ${daysUntilDue} days: `,
+    };
+  }
+
+  return {
+    cardClass: "",
+    dateClass: "text-muted-foreground",
+    prefix: "",
   };
-  if (!todoItem) return null;
-  const { title, completed, quadrant } = todoItem;
+};
+
+export default function SingleTodo({ todo }: { todo: TodoItem }) {
+  const { toggleComplete } = useTodos();
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const handleChangeChecked = async (id: string, value: boolean) => {
+    try {
+      await toggleComplete(id);
+      toast.success(value ? "Task completed!" : "Task marked as pending");
+    } catch (error) {
+      toast.error("Failed to update task");
+    }
+  };
+
+  const { title, isCompleted, isUrgent, isImportant } = todo;
+  const quadrant = calculateQuadrant(isUrgent, isImportant);
+  const dueDateUrgency = getDueDateUrgency(todo.dueDate);
+
   return (
     <Card
+      ref={setNodeRef}
+      style={style}
       className={cn(
         "flex flex-row items-center justify-between gap-4 p-3 shadow-sm border transition-all",
-        draggedTodoId === id
-          ? "opacity-50 border-dashed border-2 border-primary"
-          : "hover:shadow-md"
+        dueDateUrgency?.cardClass,
+        isCompleted && "opacity-60",
+        isDragging && "opacity-50 z-50"
       )}
     >
       <div className="flex items-center gap-2 w-full">
         <div
-          draggable
-          onDragStart={() => setDraggedTodoId && setDraggedTodoId(id)}
-          onDragEnd={() => setDraggedTodoId && setDraggedTodoId(null)}
-          className="cursor-grab text-muted-foreground p-1"
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-muted-foreground p-1 hover:text-gray-600 active:cursor-grabbing"
           title="Drag to move"
         >
           <GripVertical />
-        </div>
+        </div>{" "}
         <Checkbox
-          checked={completed}
-          onCheckedChange={(value) => handleChangeChecked(id, !!value)}
-          id={`checkbox-${id}`}
-        />
+          checked={isCompleted}
+          onCheckedChange={(value) => handleChangeChecked(todo.id, !!value)}
+          id={`checkbox-${todo.id}`}
+        />{" "}
         <TodoDetail
-          id={id}
+          todo={todo}
           triggerClassname={cn(
             "text-sm font-medium leading-none hover:underline cursor-pointer",
-            completed ? "line-through text-muted-foreground" : ""
+            isCompleted ? "line-through text-muted-foreground" : ""
           )}
-        />
+        />{" "}
+        {todo.dueDate && (
+          <div
+            className={cn(
+              "flex items-center gap-1 text-xs",
+              dueDateUrgency?.dateClass || "text-muted-foreground"
+            )}
+          >
+            <Calendar className="h-3 w-3" />
+            <span>
+              {dueDateUrgency?.prefix}
+              {format(new Date(todo.dueDate), "MMM dd")}
+            </span>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2">
-        <EditDialog id={id} todo={title} />
+        <EditDialog id={todo.id} todo={todo} />
         <DeleteDialog
-          id={id}
+          id={todo.id}
           todo={title}
           category={quadrant}
-          completed={completed}
+          completed={isCompleted}
         />
       </div>
     </Card>

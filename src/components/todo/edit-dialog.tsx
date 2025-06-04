@@ -4,28 +4,38 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import TodoForm from "./todo-form";
 import { useState } from "react";
+import { TodoItem } from "@/contexts/todo-context";
 
-export default function EditDialog({ id, todo }: { id: string; todo: string }) {
+export default function EditDialog({
+  id,
+  todo,
+}: {
+  id: string;
+  todo: TodoItem;
+}) {
   const [open, setOpen] = useState<boolean>(false);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={"outline"}>
-          <Pen />
+        <Button variant="outline" size="sm">
+          <Pen className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Todo: {todo}</DialogTitle>
+          <DialogTitle>Edit Task</DialogTitle>
+          <DialogDescription>Make changes to "{todo.title}"</DialogDescription>
         </DialogHeader>
-        <div>
-          <TodoForm id={id} onSuccess={() => setOpen(false)} />
+        <div className="py-4">
+          <TodoForm todo={todo} onSuccess={() => setOpen(false)} />
         </div>
       </DialogContent>
     </Dialog>

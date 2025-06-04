@@ -12,9 +12,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { useTodos } from "@/hooks/use-todos";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTodos } from "@/contexts/todo-context";
 
 export default function DeleteDialog({
   id,
@@ -27,27 +27,45 @@ export default function DeleteDialog({
   category: string;
   completed: boolean;
 }) {
-  const { deleteStorage, saveTodo } = useTodos();
   const [open, setOpen] = useState(false);
+  const { deleteTodo, createTodo } = useTodos();
+  const handleClick = async () => {
+    // Parse category to get isUrgent and isImportant values
+    const isUrgent = category === "1" || category === "3";
+    const isImportant = category === "1" || category === "2";
 
-  const handleClick = () => {
     const deletedTodo = {
       id,
       title: todo,
       completed: completed,
-      quadrant: category,
+      isUrgent,
+      isImportant,
     };
-    deleteStorage(id);
-    setOpen(false);
-    toast("Deleted successfully", {
-      action: {
-        label: "Undo",
-        onClick: () => {
-          saveTodo(deletedTodo);
-          toast.success("Todo restored");
+
+    try {
+      await deleteTodo(id);
+      setOpen(false);
+      toast("Deleted successfully", {
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            try {
+              await createTodo({
+                title: deletedTodo.title,
+                isUrgent: deletedTodo.isUrgent,
+                isImportant: deletedTodo.isImportant,
+                isCompleted: deletedTodo.completed,
+              });
+              toast.success("Todo restored");
+            } catch (error) {
+              toast.error("Failed to restore todo");
+            }
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      toast.error("Failed to delete todo");
+    }
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>

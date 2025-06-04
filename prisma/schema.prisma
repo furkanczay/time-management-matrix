@@ -22,15 +22,18 @@ model Task {
   id                           String    @id @default(uuid())
   title                        String
   description                  String?
-  quadrant                     Quadrant
+  isUrgent                     Boolean   @default(false)
+  isImportant                  Boolean   @default(false)
   assignedToId                 String?
   createdAt                    DateTime  @default(now())
-  updatedAt                    DateTime @updatedAt
+  updatedAt                    DateTime  @updatedAt
   completed                    Boolean   @default(false)
+  dueDate                      DateTime?
+  order                        Int       @default(0)
   creatorId                    String
   creator                      User @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: Cascade)
-  assignedTo User? @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
-  subtasks                      Subtask[]
+  assignedTo                   User? @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
+  subtasks                     Subtask[]
 }
 
 model Account {
@@ -89,11 +92,4 @@ model Verification {
   createdAt  DateTime?
   updatedAt  DateTime?
   @@map("verification")
-}
-
-enum Quadrant {
-  IMPORTANT_URGENT
-  IMPORTANT_NOT_URGENT
-  NOT_IMPORTANT_URGENT
-  NOT_IMPORTANT_NOT_URGENT
 }

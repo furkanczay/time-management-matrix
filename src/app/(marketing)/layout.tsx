@@ -10,7 +10,7 @@ export default function MainLayout({
   return (
     <>
       <Header />
-      <TodosProvider>{children}</TodosProvider>
+      {children}
       <Toaster position="top-right" richColors />
     </>
   );

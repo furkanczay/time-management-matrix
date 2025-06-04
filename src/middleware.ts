@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 const guestUrls = ["/login"];
+const protectedUrls = ["/dashboard", "/profile", "/settings"];
 
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
   const { pathname } = request.nextUrl;
 
-  if (!sessionCookie && !guestUrls.some((url) => pathname.includes(url))) {
+  if (!sessionCookie && protectedUrls.some((url) => pathname.includes(url))) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
