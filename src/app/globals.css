@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./landing.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -118,6 +119,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    scroll-behavior: smooth;
+  }
+  /* Add padding to anchors for fixed header */
+  html {
+    scroll-padding-top: 80px; /* Adjust based on your header height */
   }
 }
 

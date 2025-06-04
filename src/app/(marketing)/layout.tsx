@@ -1,4 +1,3 @@
-import { TodosProvider } from "@/context/todos-context";
 import Header from "@/components/header";
 import { Toaster } from "sonner";
 
@@ -9,7 +8,6 @@ export default function MainLayout({
 }) {
   return (
     <>
-      <Header />
       {children}
       <Toaster position="top-right" richColors />
     </>
