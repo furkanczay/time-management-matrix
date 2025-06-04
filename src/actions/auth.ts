@@ -14,7 +14,6 @@ export async function loginAction(
 ): Promise<AuthFormState> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
   try {
     await auth.api.signInEmail({
       body: {
@@ -23,8 +22,25 @@ export async function loginAction(
       },
     });
   } catch (e) {
+    const apiError = e as APIError;
+    let errorMessage = apiError?.message || "Giriş yapılırken bir hata oluştu";
+
+    // Convert generic error messages to more specific ones
+    if (
+      errorMessage.toLowerCase().includes("invalid credentials") ||
+      errorMessage.toLowerCase().includes("authentication failed") ||
+      errorMessage.toLowerCase().includes("password")
+    ) {
+      errorMessage = "Geçersiz şifre. Lütfen tekrar deneyin.";
+    } else if (
+      errorMessage.toLowerCase().includes("not found") ||
+      errorMessage.toLowerCase().includes("no user")
+    ) {
+      errorMessage = "Bu e-posta ile kayıtlı kullanıcı bulunamadı.";
+    }
+
     return {
-      error: (e as APIError)?.message,
+      error: errorMessage,
     };
   }
   redirect("/");
@@ -37,7 +53,6 @@ export async function registerAction(
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const name = formData.get("name") as string;
-
   try {
     await auth.api.signUpEmail({
       body: {
@@ -47,8 +62,26 @@ export async function registerAction(
       },
     });
   } catch (e) {
+    const apiError = e as APIError;
+    let errorMessage = apiError?.message || "Kayıt olurken bir hata oluştu";
+
+    // Convert generic error messages to more specific ones
+    if (
+      errorMessage.toLowerCase().includes("exists") ||
+      errorMessage.toLowerCase().includes("already")
+    ) {
+      errorMessage = "Bu e-posta adresi zaten kullanılıyor.";
+    } else if (errorMessage.toLowerCase().includes("password")) {
+      errorMessage = "Şifre geçersiz. Daha güçlü bir şifre deneyin.";
+    } else if (
+      errorMessage.toLowerCase().includes("email") &&
+      errorMessage.toLowerCase().includes("invalid")
+    ) {
+      errorMessage = "Geçersiz e-posta adresi formatı.";
+    }
+
     return {
-      error: (e as APIError)?.message,
+      error: errorMessage,
     };
   }
 

@@ -17,7 +17,7 @@ export default function AuthLayout() {
   const [active, setActive] = useState<string>("login");
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="flex w-full max-w-4xl shadow-lg rounded-xl overflow-hidden">
         {/* Left Side - Image/Brand */}
         <div className="hidden md:flex md:w-1/2 bg-primary relative flex-col justify-between items-center p-8">

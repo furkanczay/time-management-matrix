@@ -44,24 +44,40 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
       newErrors.email = "Please enter a valid email";
       isValid = false;
-    }
-
-    // Password validation
+    } // Password validation
     if (!formValues.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = "Şifre gerekli";
       isValid = false;
     } else if (formValues.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = "Şifre en az 6 karakter olmalıdır";
+      isValid = false;
+    } else if (
+      mode === "signup" &&
+      !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(formValues.password)
+    ) {
+      // Only enforce strict password rules for signup
+      newErrors.password =
+        "Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir";
       isValid = false;
     }
 
     setErrors(newErrors);
     return isValid;
   };
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (!validateForm()) {
       e.preventDefault();
+
+      // Show toast for password errors
+      if (
+        errors.password ||
+        (formValues.password && formValues.password.length < 6)
+      ) {
+        toast.error("Şifre geçersiz", {
+          description:
+            "Şifreniz en az 6 karakter olmalı ve güvenlik kriterlerini karşılamalıdır.",
+        });
+      }
     }
   };
 
@@ -74,10 +90,33 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   useEffect(() => {
     if (state?.error) {
-      toast.error(state?.error);
+      // Display more user-friendly error messages for common auth issues
+      if (
+        state.error.toLowerCase().includes("password") ||
+        state.error.toLowerCase().includes("şifre")
+      ) {
+        toast.error("Şifre hatalı. Lütfen tekrar deneyin.", {
+          description:
+            "Şifrenizi hatırlamıyorsanız şifremi unuttum seçeneğini kullanabilirsiniz.",
+        });
+      } else if (
+        state.error.toLowerCase().includes("user") ||
+        state.error.toLowerCase().includes("not found")
+      ) {
+        toast.error("Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.", {
+          description:
+            "Lütfen e-posta adresinizi kontrol edin veya yeni hesap oluşturun.",
+        });
+      } else if (state.error.toLowerCase().includes("exists")) {
+        toast.error("Bu e-posta adresi ile kayıtlı bir hesap zaten var.", {
+          description: "Farklı bir e-posta adresi deneyin veya giriş yapın.",
+        });
+      } else {
+        toast.error(state.error);
+      }
+      console.log("Auth error:", state.error);
     }
   }, [state?.error]);
 
@@ -125,11 +164,22 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
       <div className="space-y-2">
         <div className="flex justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Password</Label>{" "}
           {mode === "login" && (
             <a
               href="#"
               className="text-xs text-muted-foreground hover:text-primary"
+              onClick={(e) => {
+                e.preventDefault();
+                toast.info(
+                  "Şifre sıfırlama özelliği yakında aktif olacaktır.",
+                  {
+                    description:
+                      "Backend hazır olduğunda bu özellik kullanıma açılacaktır.",
+                    duration: 5000,
+                  }
+                );
+              }}
             >
               Forgot password?
             </a>
