@@ -62,7 +62,7 @@ LICENSE
 
 # Development files
 eslint.config.mjs
-postcss.config.mjs
+# postcss.config.mjs
 # Keep tsconfig.json for TypeScript path mapping
 # tsconfig.json
 # Keep components.json for UI components configuration
