@@ -8,20 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Plus, CheckCircle2, Circle, ListTodo, X, Trash2 } from "lucide-react";
 import { useTodos } from "@/contexts/todo-context";
-
-type Subtask = {
-  id: string;
-  title: string;
-  completed: boolean;
-  parentId: string;
-};
+import { Subtask } from "@/generated/prisma";
 
 export default function AddSubTask({
   id,
   subtasks,
 }: {
   id: string;
-  subtasks: Subtask[];
+  subtasks: Array<Subtask & { isCompleted: boolean }>;
 }) {
   const [isAdd, setIsAdd] = useState(false);
   const [tempInput, setTempInput] = useState("");
