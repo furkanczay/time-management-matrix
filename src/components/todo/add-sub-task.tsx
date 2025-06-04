@@ -206,7 +206,7 @@ export default function AddSubTask({
       {/* Subtasks List */}
       {subtasks.length > 0 && (
         <div className="space-y-3">
-          {subtasks.map((item, idx) => (
+          {subtasks.map((item) => (
             <div
               key={item.id}
               className={cn(

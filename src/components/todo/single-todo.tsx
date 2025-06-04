@@ -1,11 +1,16 @@
 "use client";
-import { GripVertical, Calendar } from "lucide-react";
+import { GripVertical, Calendar, MoreVertical } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import DeleteDialog from "./delete-dialog";
 import { cn } from "@/lib/utils";
 import EditDialog from "./edit-dialog";
 import { Card } from "@/components/ui/card";
 import TodoDetail from "./todo-detail";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useTodos, TodoItem, calculateQuadrant } from "@/contexts/todo-context";
 import { toast } from "sonner";
 import { format, differenceInDays } from "date-fns";
@@ -92,12 +97,13 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex flex-row items-center justify-between gap-4 p-3 shadow-sm border transition-all",
+        "flex flex-row items-center justify-between gap-3 p-2 shadow-sm border transition-all",
         dueDateUrgency?.cardClass,
-        isCompleted && "opacity-60",
-        isDragging && "opacity-50 z-50"
+        isCompleted && "opacity-40",
+        isDragging && "opacity-30 z-50"
       )}
     >
+      {" "}
       <div className="flex items-center gap-2 w-full">
         <div
           {...attributes}
@@ -106,12 +112,12 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
           title="Drag to move"
         >
           <GripVertical />
-        </div>{" "}
+        </div>
         <Checkbox
           checked={isCompleted}
           onCheckedChange={(value) => handleChangeChecked(todo.id, !!value)}
           id={`checkbox-${todo.id}`}
-        />{" "}
+        />
         <div className="flex flex-col items-start gap-1 flex-1">
           <TodoDetail
             todo={todo}
@@ -120,7 +126,7 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
               isCompleted ? "line-through text-muted-foreground" : ""
             )}
           />
-        </div>{" "}
+        </div>
         <div className="flex items-center gap-2">
           {todo.subtasks && todo.subtasks.length > 0 && (
             <div
@@ -147,20 +153,27 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
               <span>
                 {dueDateUrgency?.prefix}
                 {format(new Date(todo.dueDate), "MMM dd")}
-              </span>
+              </span>{" "}
             </div>
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <EditDialog id={todo.id} todo={todo} />
-        <DeleteDialog
-          id={todo.id}
-          todo={title}
-          category={quadrant}
-          completed={isCompleted}
-        />
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="p-1 hover:bg-muted rounded-md transition-colors">
+            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-32">
+          <EditDialog id={todo.id} todo={todo} />
+          <DeleteDialog
+            id={todo.id}
+            todo={title}
+            category={quadrant}
+            completed={isCompleted}
+          />
+        </DropdownMenuContent>
+      </DropdownMenu>
     </Card>
   );
 }

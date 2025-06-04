@@ -1,6 +1,5 @@
 "use client";
 import { Pen } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import TodoForm from "./todo-form";
 import { useState } from "react";
 import { TodoItem } from "@/contexts/todo-context";
@@ -21,13 +21,13 @@ export default function EditDialog({
   todo: TodoItem;
 }) {
   const [open, setOpen] = useState<boolean>(false);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Pen className="h-4 w-4" />
-        </Button>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <Pen className="h-4 w-4 mr-2" />
+          Edit
+        </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

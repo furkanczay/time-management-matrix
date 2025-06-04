@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -69,9 +70,13 @@ export default function DeleteDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={"destructive"} size={"icon"}>
-          <XIcon />
-        </Button>
+        <DropdownMenuItem
+          onSelect={(e) => e.preventDefault()}
+          className="text-destructive focus:text-destructive"
+        >
+          <XIcon className="h-4 w-4 mr-2" />
+          Delete
+        </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

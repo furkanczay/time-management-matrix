@@ -160,12 +160,12 @@ export default function TodoDetail({
         >
           {todo?.title}
         </Button>
-      </SheetTrigger>
-      <SheetContent className="sm:max-w-4xl overflow-y-auto bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-950 dark:to-gray-900/50">
-        <div className="space-y-8 py-6">
+      </SheetTrigger>{" "}
+      <SheetContent className="sm:max-w-4xl overflow-y-auto dark:bg-gray-950/80 backdrop-blur-sm">
+        <div className="space-y-6 px-6 py-10">
           {/* Header Section with Modern Card Design */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-8">
-            <SheetHeader className="space-y-6">
+          <div className="bg-muted backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-800/50 p-6">
+            <SheetHeader className="space-y-4">
               <div className="space-y-6">
                 {" "}
                 <div className="flex items-start justify-between">
@@ -218,49 +218,46 @@ export default function TodoDetail({
                 )}
               </div>
             </SheetHeader>
-          </div>
-
+          </div>{" "}
           {/* Description Section with Enhanced Styling */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Flag className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="bg-muted backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-800/50 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-100/80 dark:bg-blue-900/30 rounded-lg">
+                <Flag className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Description
               </h3>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-gray-50/80 dark:bg-gray-800/30 rounded-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
               <TodoDescription id={todo.id} description={todo?.description} />
             </div>
-          </div>
-
+          </div>{" "}
           {/* Properties Grid with Enhanced Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Priority Section */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="bg-muted backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-800/50 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-100/80 dark:bg-purple-900/30 rounded-lg">
+                  <Target className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Priority Matrix
                 </h3>
-              </div>
-
-              <div className="space-y-4">
+              </div>{" "}
+              <div className="space-y-3">
                 <div
                   className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border-2 transition-all",
+                    "flex items-center justify-between p-3 rounded-lg border transition-all",
                     todo.isUrgent
-                      ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 dark:from-red-900/20 dark:to-red-800/20 dark:border-red-700"
-                      : "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+                      ? "bg-red-50/80 border-red-200/80 dark:bg-red-900/20 dark:border-red-700/50"
+                      : "bg-gray-50/80 border-gray-200/80 dark:bg-gray-800/30 dark:border-gray-700/50"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <Flag
                       className={cn(
-                        "w-5 h-5",
+                        "w-4 h-4",
                         todo.isUrgent
                           ? "text-red-600 dark:text-red-400"
                           : "text-gray-400"
@@ -273,15 +270,21 @@ export default function TodoDetail({
                   <div className="flex items-center gap-2">
                     {todo.isUrgent ? (
                       <>
-                        <Check className="w-5 h-5 text-green-600" />
-                        <Badge variant="destructive" className="text-xs">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <Badge
+                          variant="destructive"
+                          className="text-xs px-2 py-1"
+                        >
                           High
                         </Badge>
                       </>
                     ) : (
                       <>
-                        <X className="w-5 h-5 text-gray-400" />
-                        <Badge variant="secondary" className="text-xs">
+                        <X className="w-4 h-4 text-gray-400" />
+                        <Badge
+                          variant="secondary"
+                          className="text-xs px-2 py-1"
+                        >
                           Low
                         </Badge>
                       </>
@@ -291,16 +294,16 @@ export default function TodoDetail({
 
                 <div
                   className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border-2 transition-all",
+                    "flex items-center justify-between p-3 rounded-lg border transition-all",
                     todo.isImportant
-                      ? "bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700"
-                      : "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+                      ? "bg-blue-50/80 border-blue-200/80 dark:bg-blue-900/20 dark:border-blue-700/50"
+                      : "bg-gray-50/80 border-gray-200/80 dark:bg-gray-800/30 dark:border-gray-700/50"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <AlertTriangle
                       className={cn(
-                        "w-5 h-5",
+                        "w-4 h-4",
                         todo.isImportant
                           ? "text-blue-600 dark:text-blue-400"
                           : "text-gray-400"
@@ -313,15 +316,18 @@ export default function TodoDetail({
                   <div className="flex items-center gap-2">
                     {todo.isImportant ? (
                       <>
-                        <Check className="w-5 h-5 text-green-600" />
-                        <Badge variant="default" className="text-xs">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <Badge variant="default" className="text-xs px-2 py-1">
                           High
                         </Badge>
                       </>
                     ) : (
                       <>
-                        <X className="w-5 h-5 text-gray-400" />
-                        <Badge variant="secondary" className="text-xs">
+                        <X className="w-4 h-4 text-gray-400" />
+                        <Badge
+                          variant="secondary"
+                          className="text-xs px-2 py-1"
+                        >
                           Low
                         </Badge>
                       </>
@@ -332,12 +338,12 @@ export default function TodoDetail({
             </div>
 
             {/* Status & Timeline Section */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <Clock className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="bg-muted backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-800/50 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-green-100/80 dark:bg-green-900/30 rounded-lg">
+                  <Clock className="w-4 h-4 text-green-600 dark:text-green-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Status & Timeline
                 </h3>
               </div>
@@ -425,12 +431,10 @@ export default function TodoDetail({
                 )}
               </div>
             </div>
-          </div>
-
-          <Separator className="my-8" />
-
+          </div>{" "}
+          <Separator className="my-6" />
           {/* Subtasks Section with Enhanced Design */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-8">
+          <div className="bg-muted backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-800/50 p-6">
             <AddSubTask id={todo.id} subtasks={todo.subtasks ?? []} />
           </div>
         </div>

@@ -77,7 +77,10 @@ interface TodoContextType {
   updateTodo: (id: string, data: UpdateTodoData) => Promise<void>;
   deleteTodo: (id: string) => Promise<void>;
   toggleComplete: (id: string) => Promise<void>;
-  updateTodoSubtasks: (todoId: string, subtasks: any[]) => void;
+  updateTodoSubtasks: (
+    todoId: string,
+    subtasks: Array<Subtask & { isCompleted: boolean }>
+  ) => void;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -236,18 +239,23 @@ export function TodoProvider({
       throw err;
     }
   };
-
   // Update subtasks for a specific todo without refreshing entire context
-  const updateTodoSubtasks = (todoId: string, subtasks: any[]) => {
+  const updateTodoSubtasks = (
+    todoId: string,
+    subtasks: Array<Subtask & { isCompleted: boolean }>
+  ) => {
     setTodos((prev) =>
       prev.map((todo) =>
         todo.id === todoId
           ? {
               ...todo,
-              subtasks: subtasks.map((subtask: any) => ({
-                ...subtask,
-                isCompleted: subtask.completed || subtask.isCompleted || false,
-              })),
+              subtasks: subtasks.map(
+                (subtask: Subtask & { isCompleted: boolean }) => ({
+                  ...subtask,
+                  isCompleted:
+                    subtask.completed || subtask.isCompleted || false,
+                })
+              ),
             }
           : todo
       )
