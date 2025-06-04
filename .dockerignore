@@ -61,10 +61,12 @@ README.md
 LICENSE
 
 # Development files
-tsconfig.json
 eslint.config.mjs
 postcss.config.mjs
-components.json
+# Keep tsconfig.json for TypeScript path mapping
+# tsconfig.json
+# Keep components.json for UI components configuration
+# components.json
 
 # Keep .npmrc for dependency installation
 # .npmrc
