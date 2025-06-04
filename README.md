@@ -58,7 +58,7 @@ A modern, intuitive task management application built with Next.js that implemen
 
 - **Next.js API Routes** - Serverless API endpoints
 - **Prisma** - Type-safe database ORM
-- **PostgreSQL** - Robust relational database
+- **PostgreSQL 17** - Latest robust relational database
 - **Better Auth** - Modern authentication solution
 - **Zod** - Runtime type validation
 
@@ -72,9 +72,9 @@ A modern, intuitive task management application built with Next.js that implemen
 
 Before running this project, make sure you have the following installed:
 
-- **Node.js** (v18 or higher)
+- **Node.js** (v22 LTS or higher)
 - **npm**, **yarn**, **pnpm**, or **bun**
-- **PostgreSQL** database
+- **PostgreSQL** database (v17 or higher recommended)
 
 ## 🚀 Getting Started
 
@@ -97,9 +97,20 @@ pnpm install
 bun install
 ```
 
+> **Note**: If you encounter peer dependency issues with npm, the project includes a `.npmrc` file with `legacy-peer-deps=true` to resolve compatibility issues.
+
 ### 3. Environment Setup
 
-Create a `.env.local` file in the root directory and add the following environment variables:
+Copy the example environment file and configure your variables:
+
+```bash
+# Copy the example environment file
+cp .env.example .env.local
+
+# Edit the .env.local file with your actual values
+```
+
+Required environment variables:
 
 ```env
 # Database
@@ -112,6 +123,8 @@ BETTER_AUTH_URL="http://localhost:3000"
 # Next.js
 NEXTAUTH_URL="http://localhost:3000"
 ```
+
+> **Note**: See `.env.example` for detailed configuration examples and production settings.
 
 ### 4. Database Setup
 
@@ -141,6 +154,69 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+
+## 🐳 Docker Setup (Alternative)
+
+### Using Docker Compose (Recommended)
+
+The easiest way to run the application with Docker is using Docker Compose, which will set up both the application and PostgreSQL database:
+
+```bash
+# Clone and navigate to the project
+git clone <repository-url>
+cd time-management-matrix
+
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up -d --build
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000)
+
+### Manual Docker Build
+
+If you prefer to build and run manually:
+
+```bash
+# Build the Docker image
+docker build -t time-management-matrix .
+
+# Run PostgreSQL database
+docker run -d \
+  --name postgres-db \
+  -e POSTGRES_DB=time_management_matrix \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:17-alpine
+
+# Run the application
+docker run -d \
+  --name time-management-app \
+  --link postgres-db:postgres \
+  -e DATABASE_URL="postgresql://postgres:postgres@postgres:5432/time_management_matrix" \
+  -e BETTER_AUTH_SECRET="your-secret-key" \
+  -e BETTER_AUTH_URL="http://localhost:3000" \
+  -p 3000:3000 \
+  time-management-matrix
+```
+
+### Development with Docker
+
+For development with hot reload:
+
+```bash
+# Run only the PostgreSQL database
+docker-compose -f docker-compose.dev.yml up postgres-dev -d
+
+# Set your environment variables to use the containerized database
+# DATABASE_URL="postgresql://postgres:postgres@localhost:5433/time_management_matrix_dev"
+
+# Run the application locally
+npm run dev
+```
 
 ## 📁 Project Structure
 

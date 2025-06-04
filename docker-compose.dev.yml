@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database for Development
+  postgres-dev:
+    image: postgres:17-alpine
+    container_name: time-management-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: time_management_matrix_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - time-management-dev-network
+
+  # Development app (optional, you can run locally too)
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: time-management-app-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://postgres:postgres@postgres-dev:5432/time_management_matrix_dev"
+      BETTER_AUTH_SECRET: "dev-secret-key"
+      BETTER_AUTH_URL: "http://localhost:3001"
+      NEXTAUTH_URL: "http://localhost:3001"
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - postgres-dev
+    networks:
+      - time-management-dev-network
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  time-management-dev-network:
+    driver: bridge

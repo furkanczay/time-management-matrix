@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:17-alpine
+    container_name: time-management-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: time_management_matrix
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - time-management-network
+
+  # Time Management Matrix App
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: time-management-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/time_management_matrix"
+      BETTER_AUTH_SECRET: "your-super-secret-key-change-this-in-production"
+      BETTER_AUTH_URL: "http://localhost:3000"
+      NEXTAUTH_URL: "http://localhost:3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - time-management-network
+    # Wait for postgres to be ready
+    command: >
+      sh -c "
+        until nc -z postgres 5432; do
+          echo 'Waiting for postgres...'
+          sleep 1
+        done
+        echo 'PostgreSQL is ready!'
+        npx prisma migrate deploy
+        node server.js
+      "
+
+volumes:
+  postgres_data:
+
+networks:
+  time-management-network:
+    driver: bridge
