@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="600px" viewBox="0 0 800 600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Time Management Illustration</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="timeGradient">
+            <stop stop-color="#FFFFFF" stop-opacity="0.8" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.3" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Clock Face -->
+        <circle cx="400" cy="300" r="200" stroke="#FFFFFF" stroke-width="10" fill="url(#timeGradient)" opacity="0.8"></circle>
+        
+        <!-- Clock Center -->
+        <circle cx="400" cy="300" r="15" fill="#FFFFFF"></circle>
+        
+        <!-- Clock Numbers -->
+        <text x="400" y="130" font-family="Arial" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">12</text>
+        <text x="570" y="305" font-family="Arial" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+        <text x="400" y="480" font-family="Arial" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+        <text x="230" y="305" font-family="Arial" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">9</text>
+        
+        <!-- Clock Hands -->
+        <line x1="400" y1="300" x2="400" y2="180" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></line>
+        <line x1="400" y1="300" x2="480" y2="300" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"></line>
+        
+        <!-- Task Items -->
+        <rect x="580" y="150" width="120" height="30" rx="5" fill="#FFFFFF" opacity="0.8"></rect>
+        <rect x="580" y="190" width="90" height="30" rx="5" fill="#FFFFFF" opacity="0.7"></rect>
+        <rect x="580" y="230" width="140" height="30" rx="5" fill="#FFFFFF" opacity="0.6"></rect>
+        
+        <!-- Check Items -->
+        <circle cx="150" cy="150" r="15" stroke="#FFFFFF" stroke-width="2" fill="none"></circle>
+        <path d="M142,150 L148,156 L158,146" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+        
+        <circle cx="150" cy="190" r="15" stroke="#FFFFFF" stroke-width="2" fill="none"></circle>
+        <path d="M142,190 L148,196 L158,186" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+        
+        <circle cx="150" cy="230" r="15" stroke="#FFFFFF" stroke-width="2" fill="none"></circle>
+        
+        <!-- Text Lines -->
+        <line x1="180" y1="150" x2="280" y2="150" stroke="#FFFFFF" stroke-width="2"></line>
+        <line x1="180" y1="190" x2="260" y2="190" stroke="#FFFFFF" stroke-width="2"></line>
+        <line x1="180" y1="230" x2="300" y2="230" stroke="#FFFFFF" stroke-width="2"></line>
+        
+        <!-- Decorative Elements -->
+        <circle cx="650" cy="400" r="40" fill="#FFFFFF" opacity="0.2"></circle>
+        <circle cx="700" cy="450" r="25" fill="#FFFFFF" opacity="0.15"></circle>
+        <circle cx="150" cy="400" r="35" fill="#FFFFFF" opacity="0.1"></circle>
+        <circle cx="100" cy="350" r="20" fill="#FFFFFF" opacity="0.2"></circle>
+    </g>
+</svg>

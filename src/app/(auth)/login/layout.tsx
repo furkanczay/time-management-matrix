@@ -10,5 +10,10 @@ export default async function AuthLayout({
   if (session) {
     return redirect("/");
   }
-  return <>{children}</>;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-4">
+      {children}
+    </div>
+  );
 }
