@@ -125,6 +125,72 @@
   html {
     scroll-padding-top: 80px; /* Adjust based on your header height */
   }
+
+  /* Enhanced scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Smooth font rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom selection colors */
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary-foreground));
+  }
+
+  /* Modern animations for micro-interactions */
+  @keyframes gentle-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 }
 
 /* Custom scrollbar styles for matrix view */
@@ -150,19 +216,95 @@
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: rgb(148 163 184);
   }
-}
 
-/* Improved focus styles for better accessibility */
-@layer components {
-  .focus-visible {
-    @apply outline-2 outline-offset-2 outline-blue-500;
+  /* Modern micro-interactions */
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
   }
 
-  .matrix-card-transition {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
   }
 
-  .matrix-card-transition:hover {
-    @apply shadow-md;
+  .animate-gentle-pulse {
+    animation: gentle-pulse 2s ease-in-out infinite;
+  }
+
+  /* Hover effects for cards */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Modern glass morphism effect */
+  .glass-effect {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass-effect {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Quadrant specific gradients */
+  .quadrant-gradient-urgent {
+    background: linear-gradient(
+      135deg,
+      rgb(254 242 242) 0%,
+      rgb(254 226 226) 100%
+    );
+    border-color: rgb(252 165 165);
+  }
+
+  .dark .quadrant-gradient-urgent {
+    background: linear-gradient(135deg, rgb(127 29 29) 0%, rgb(153 27 27) 100%);
+    border-color: rgb(185 28 28);
+  }
+
+  .quadrant-gradient-important {
+    background: linear-gradient(
+      135deg,
+      rgb(255 251 235) 0%,
+      rgb(254 243 199) 100%
+    );
+    border-color: rgb(252 211 77);
+  }
+
+  .dark .quadrant-gradient-important {
+    background: linear-gradient(135deg, rgb(120 53 15) 0%, rgb(146 64 14) 100%);
+    border-color: rgb(217 119 6);
+  }
+
+  .quadrant-gradient-delegate {
+    background: linear-gradient(
+      135deg,
+      rgb(239 246 255) 0%,
+      rgb(219 234 254) 100%
+    );
+    border-color: rgb(147 197 253);
+  }
+
+  .dark .quadrant-gradient-delegate {
+    background: linear-gradient(135deg, rgb(30 58 138) 0%, rgb(29 78 216) 100%);
+    border-color: rgb(59 130 246);
+  }
+
+  .quadrant-gradient-eliminate {
+    background: linear-gradient(
+      135deg,
+      rgb(249 250 251) 0%,
+      rgb(243 244 246) 100%
+    );
+    border-color: rgb(209 213 219);
+  }
+
+  .dark .quadrant-gradient-eliminate {
+    background: linear-gradient(135deg, rgb(55 65 81) 0%, rgb(75 85 99) 100%);
+    border-color: rgb(107 114 128);
   }
 }

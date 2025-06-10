@@ -13,6 +13,7 @@ export interface Todo {
   updatedAt: Date;
 }
 
+// Helper function to parse quadrant to boolean values
 function parseQuadrant(quadrant: string): {
   isUrgent: boolean;
   isImportant: boolean;
@@ -63,6 +64,7 @@ interface UpdateTodoParams {
   listId?: string | null;
 }
 
+// GET - Fetch todos
 export async function getTodos(params: GetTodosParams = {}) {
   const {
     search,
@@ -81,6 +83,7 @@ export async function getTodos(params: GetTodosParams = {}) {
       throw new Error("Unauthorized: No session found");
     }
 
+    // Calculate isUrgent and isImportant from quadrant if provided
     let urgentImportantFilter = {};
     if (quadrant) {
       const { isUrgent, isImportant } = parseQuadrant(quadrant);
@@ -90,6 +93,7 @@ export async function getTodos(params: GetTodosParams = {}) {
       };
     }
 
+    // Add today's date filter if enabled
     let dateFilter = {};
     if (filterToday) {
       const today = new Date();
@@ -113,26 +117,30 @@ export async function getTodos(params: GetTodosParams = {}) {
           lte: endOfDay,
         },
       };
-    }
+    } // Build orderBy based on sortBy parameter
     const orderByClause: Array<Record<string, "asc" | "desc">> = [];
 
+    // Always sort by completion status first (incomplete tasks first)
     orderByClause.push({ completed: "asc" });
 
+    // Then add the requested sort field
     if (sortBy === "dueDate") {
       orderByClause.push({ dueDate: sortOrder });
     } else if (sortBy === "createdAt") {
       orderByClause.push({ createdAt: sortOrder });
     } else {
+      // Default sort by order
       orderByClause.push({ order: sortOrder });
     }
 
+    // Add createdAt as final tiebreaker
     if (sortBy !== "createdAt") {
       orderByClause.push({ createdAt: "desc" });
     }
     const todos = await db.task.findMany({
       where: {
         AND: [
-          { creatorId: session.user.id },
+          { creatorId: session.user.id }, // Only fetch user's own todos
           search
             ? {
                 OR: [
@@ -149,13 +157,13 @@ export async function getTodos(params: GetTodosParams = {}) {
         ],
       },
       include: {
-        subtasks: true,
-        list: true,
+        subtasks: true, // Include subtasks in the response
+        list: true, // Include list information
       },
       orderBy: orderByClause,
       take: limit,
       skip: offset,
-    });
+    }); // Add isCompleted field to each todo and its subtasks
     const todosWithIsCompleted = todos.map((todo) => ({
       ...todo,
       isCompleted: todo.completed,
@@ -172,6 +180,7 @@ export async function getTodos(params: GetTodosParams = {}) {
   }
 }
 
+// POST - Create todo
 export async function createTodo(data: CreateTodoParams) {
   try {
     const session = await getSession();
@@ -179,6 +188,7 @@ export async function createTodo(data: CreateTodoParams) {
       throw new Error("Unauthorized: No session found");
     }
 
+    // Find the highest order value in the same quadrant for the user
     const existingTodos = await db.task.findMany({
       where: {
         creatorId: session.user.id,
@@ -211,6 +221,7 @@ export async function createTodo(data: CreateTodoParams) {
       },
     });
 
+    // Add isCompleted field to response
     return {
       ...todo,
       isCompleted: todo.completed,
@@ -221,12 +232,13 @@ export async function createTodo(data: CreateTodoParams) {
   }
 }
 
+// PUT - Update todo
 export async function updateTodo(id: string, data: UpdateTodoParams) {
   try {
     const session = await getSession();
     if (!session || !session.user) {
       throw new Error("Unauthorized: No session found");
-    }
+    } // Prepare update data
     const updateData: {
       updatedAt: Date;
       title?: string;
@@ -240,7 +252,7 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
       listId?: string | null;
     } = {
       updatedAt: new Date(),
-    };
+    }; // Add individual fields if provided
     if (data.title !== undefined) updateData.title = data.title;
     if (data.description !== undefined)
       updateData.description = data.description;
@@ -254,7 +266,7 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
     const todo = await db.task.update({
       where: {
         id,
-        creatorId: session.user.id,
+        creatorId: session.user.id, // Only update user's own todos
       },
       data: updateData,
       include: {
@@ -263,6 +275,7 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
       },
     });
 
+    // Add isCompleted field to response
     return {
       ...todo,
       isCompleted: todo.completed,
@@ -273,6 +286,7 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
   }
 }
 
+// PATCH - Mark as complete/incomplete
 export async function toggleTodoComplete(id: string) {
   try {
     const session = await getSession();
@@ -283,7 +297,7 @@ export async function toggleTodoComplete(id: string) {
     const currentTodo = await db.task.findUnique({
       where: {
         id,
-        creatorId: session.user.id,
+        creatorId: session.user.id, // Only access user's own todos
       },
     });
 
@@ -294,7 +308,7 @@ export async function toggleTodoComplete(id: string) {
     const todo = await db.task.update({
       where: {
         id,
-        creatorId: session.user.id,
+        creatorId: session.user.id, // Only update user's own todos
       },
       data: {
         completed: !currentTodo.completed,
@@ -302,6 +316,7 @@ export async function toggleTodoComplete(id: string) {
       },
     });
 
+    // Add isCompleted field to response
     return {
       ...todo,
       isCompleted: todo.completed,
@@ -312,6 +327,7 @@ export async function toggleTodoComplete(id: string) {
   }
 }
 
+// DELETE - Delete todo
 export async function deleteTodo(id: string) {
   try {
     const session = await getSession();
@@ -322,7 +338,7 @@ export async function deleteTodo(id: string) {
     await db.task.delete({
       where: {
         id,
-        creatorId: session.user.id,
+        creatorId: session.user.id, // Only delete user's own todos
       },
     });
 

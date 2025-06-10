@@ -42,20 +42,26 @@ export default function SearchForm({ currentSearch }: SearchFormProps) {
       handleSearch();
     }
   };
-
   return (
-    <div className="inline-flex items-center gap-2">
-      <Input
-        type="text"
-        placeholder="Search todos..."
-        className="w-80"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyPress={handleKeyPress}
-      />
-      <Button onClick={handleSearch}>
-        <Search />
-      </Button>
+    <div className="relative max-w-md w-full">
+      <div className="relative flex items-center">
+        <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+        <Input
+          type="text"
+          placeholder="Search tasks..."
+          className="pl-10 pr-20 h-11 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 focus:bg-background transition-all duration-200 rounded-xl shadow-sm"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+        <Button
+          onClick={handleSearch}
+          size="sm"
+          className="absolute right-1 h-9 px-3 rounded-lg bg-primary/90 hover:bg-primary text-primary-foreground shadow-sm transition-all duration-200"
+        >
+          Search
+        </Button>
+      </div>
     </div>
   );
 }
