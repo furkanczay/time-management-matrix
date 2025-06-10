@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#000000"/>
+  <rect x="64" y="64" width="384" height="384" rx="48" fill="white"/>
+  
+  <!-- Matrix Grid -->
+  <line x1="256" y1="128" x2="256" y2="384" stroke="#000000" stroke-width="2"/>
+  <line x1="128" y1="256" x2="384" y2="256" stroke="#000000" stroke-width="2"/>
+  
+  <!-- Quadrant Labels -->
+  <text x="192" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#000000">U/I</text>
+  <text x="320" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#000000">NU/I</text>
+  <text x="192" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#000000">U/NI</text>
+  <text x="320" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#000000">NU/NI</text>
+  
+  <!-- Clock Icon -->
+  <circle cx="256" cy="140" r="16" stroke="#000000" stroke-width="2" fill="none"/>
+  <line x1="256" y1="132" x2="256" y2="140" stroke="#000000" stroke-width="2"/>
+  <line x1="256" y1="140" x2="260" y2="144" stroke="#000000" stroke-width="2"/>
+</svg>
