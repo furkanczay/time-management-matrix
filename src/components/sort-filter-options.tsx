@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarIcon, SortAsc, SortDesc } from "lucide-react";
+import { CalendarIcon, SortAsc, SortDesc, FolderOpen, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./ui/button";
@@ -16,11 +16,13 @@ import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import { useList } from "@/contexts/list-context";
 
 interface SortFilterOptionsProps {
   currentSortBy?: string;
   currentSortOrder?: string;
   currentFilterDate?: string;
+  currentFilterList?: string;
   showOnlyToday?: boolean;
 }
 
@@ -28,15 +30,16 @@ export default function SortFilterOptions({
   currentSortBy = "order",
   currentSortOrder = "asc",
   currentFilterDate,
+  currentFilterList,
   showOnlyToday = false,
 }: SortFilterOptionsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { lists } = useList();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     currentFilterDate ? new Date(currentFilterDate) : undefined
   );
 
-  // Build URL with current params  // Build URL with current params
   const createQueryString = (params: Record<string, string | null>) => {
     const newParams = new URLSearchParams(searchParams.toString());
 
@@ -72,13 +75,20 @@ export default function SortFilterOptions({
       router.push(`/dashboard?${createQueryString({ filterDate: null })}`);
     }
   };
-
   const handleTodayToggle = () => {
     const newShowOnlyToday = !showOnlyToday;
     router.push(
       `/dashboard?${createQueryString({
         showOnlyToday: newShowOnlyToday ? "true" : null,
-        filterDate: null, // Clear specific date when toggling today
+        filterDate: null,
+      })}`
+    );
+  };
+
+  const handleListFilter = (listId: string | null) => {
+    router.push(
+      `/dashboard?${createQueryString({
+        filterList: listId,
       })}`
     );
   };
@@ -90,15 +100,16 @@ export default function SortFilterOptions({
         sortBy: null,
         sortOrder: null,
         filterDate: null,
+        filterList: null,
         showOnlyToday: null,
       })}`
     );
   };
-
   const hasActiveFilters =
     currentSortBy !== "order" ||
     currentSortOrder !== "asc" ||
     !!currentFilterDate ||
+    !!currentFilterList ||
     showOnlyToday;
 
   return (
@@ -153,8 +164,42 @@ export default function SortFilterOptions({
               onSelect={handleDateSelect}
               initialFocus
             />
-          </PopoverContent>
+          </PopoverContent>{" "}
         </Popover>
+
+        <Select
+          value={currentFilterList || "all"}
+          onValueChange={(value) =>
+            handleListFilter(value === "all" ? null : value)
+          }
+        >
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Filter by list" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Lists</SelectItem>
+            <SelectItem value="ungrouped">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gray-400" />
+                <span>Gruplanmamış</span>
+              </div>
+            </SelectItem>
+            {lists.map((list) => (
+              <SelectItem key={list.id} value={list.id}>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: list.color }}
+                  />
+                  <span>{list.title}</span>
+                  <span className="text-muted-foreground text-xs">
+                    ({list._count.tasks})
+                  </span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Button
           variant={showOnlyToday ? "default" : "outline"}
@@ -193,10 +238,29 @@ export default function SortFilterOptions({
             <Badge variant="secondary" className="text-xs">
               Date: {format(selectedDate, "dd MMM yyyy")}
             </Badge>
-          )}
+          )}{" "}
           {showOnlyToday && (
             <Badge variant="secondary" className="text-xs">
               Today only
+            </Badge>
+          )}
+          {currentFilterList && (
+            <Badge
+              variant="secondary"
+              className="text-xs flex items-center gap-1"
+            >
+              <FolderOpen className="w-3 h-3" />
+              {currentFilterList === "ungrouped"
+                ? "Gruplanmamış"
+                : lists.find((l) => l.id === currentFilterList)?.title ||
+                  "Unknown List"}
+              <X
+                className="w-3 h-3 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleListFilter(null);
+                }}
+              />
             </Badge>
           )}
         </div>

@@ -41,9 +41,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    const { title, description, isUrgent, isImportant, isCompleted, dueDate } =
-      body;
+    const {
+      title,
+      description,
+      isUrgent,
+      isImportant,
+      isCompleted,
+      dueDate,
+      listId,
+    } = body;
 
     if (!title || isUrgent === undefined || isImportant === undefined) {
       return NextResponse.json(
@@ -62,6 +68,7 @@ export async function POST(request: NextRequest) {
       isImportant: Boolean(isImportant),
       isCompleted: Boolean(isCompleted),
       dueDate: dueDate ? new Date(dueDate) : null,
+      listId: listId || null,
     });
 
     return NextResponse.json(

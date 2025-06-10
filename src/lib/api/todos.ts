@@ -13,7 +13,6 @@ export interface Todo {
   updatedAt: Date;
 }
 
-// Helper function to parse quadrant to boolean values
 function parseQuadrant(quadrant: string): {
   isUrgent: boolean;
   isImportant: boolean;
@@ -50,6 +49,7 @@ interface CreateTodoParams {
   isImportant: boolean;
   isCompleted?: boolean;
   dueDate?: Date | null;
+  listId?: string | null;
 }
 
 interface UpdateTodoParams {
@@ -60,9 +60,9 @@ interface UpdateTodoParams {
   isCompleted?: boolean;
   dueDate?: Date | null;
   order?: number;
+  listId?: string | null;
 }
 
-// GET - Fetch todos
 export async function getTodos(params: GetTodosParams = {}) {
   const {
     search,
@@ -81,7 +81,6 @@ export async function getTodos(params: GetTodosParams = {}) {
       throw new Error("Unauthorized: No session found");
     }
 
-    // Calculate isUrgent and isImportant from quadrant if provided
     let urgentImportantFilter = {};
     if (quadrant) {
       const { isUrgent, isImportant } = parseQuadrant(quadrant);
@@ -91,7 +90,6 @@ export async function getTodos(params: GetTodosParams = {}) {
       };
     }
 
-    // Add today's date filter if enabled
     let dateFilter = {};
     if (filterToday) {
       const today = new Date();
@@ -115,30 +113,26 @@ export async function getTodos(params: GetTodosParams = {}) {
           lte: endOfDay,
         },
       };
-    } // Build orderBy based on sortBy parameter
+    }
     const orderByClause: Array<Record<string, "asc" | "desc">> = [];
 
-    // Always sort by completion status first (incomplete tasks first)
     orderByClause.push({ completed: "asc" });
 
-    // Then add the requested sort field
     if (sortBy === "dueDate") {
       orderByClause.push({ dueDate: sortOrder });
     } else if (sortBy === "createdAt") {
       orderByClause.push({ createdAt: sortOrder });
     } else {
-      // Default sort by order
       orderByClause.push({ order: sortOrder });
     }
 
-    // Add createdAt as final tiebreaker
     if (sortBy !== "createdAt") {
       orderByClause.push({ createdAt: "desc" });
     }
     const todos = await db.task.findMany({
       where: {
         AND: [
-          { creatorId: session.user.id }, // Only fetch user's own todos
+          { creatorId: session.user.id },
           search
             ? {
                 OR: [
@@ -155,12 +149,13 @@ export async function getTodos(params: GetTodosParams = {}) {
         ],
       },
       include: {
-        subtasks: true, // Include subtasks in the response
+        subtasks: true,
+        list: true,
       },
       orderBy: orderByClause,
       take: limit,
       skip: offset,
-    }); // Add isCompleted field to each todo and its subtasks
+    });
     const todosWithIsCompleted = todos.map((todo) => ({
       ...todo,
       isCompleted: todo.completed,
@@ -177,7 +172,6 @@ export async function getTodos(params: GetTodosParams = {}) {
   }
 }
 
-// POST - Create todo
 export async function createTodo(data: CreateTodoParams) {
   try {
     const session = await getSession();
@@ -185,7 +179,6 @@ export async function createTodo(data: CreateTodoParams) {
       throw new Error("Unauthorized: No session found");
     }
 
-    // Find the highest order value in the same quadrant for the user
     const existingTodos = await db.task.findMany({
       where: {
         creatorId: session.user.id,
@@ -198,7 +191,6 @@ export async function createTodo(data: CreateTodoParams) {
     });
 
     const nextOrder = existingTodos.length > 0 ? existingTodos[0].order + 1 : 0;
-
     const todo = await db.task.create({
       data: {
         title: data.title,
@@ -207,16 +199,18 @@ export async function createTodo(data: CreateTodoParams) {
         isImportant: data.isImportant,
         completed: data.isCompleted ?? false,
         dueDate: data.dueDate,
+        listId: data.listId,
         order: nextOrder,
         createdAt: new Date(),
         updatedAt: new Date(),
-        creator: {
-          connect: { id: session.user.id },
-        },
+        creatorId: session.user.id,
+      },
+      include: {
+        list: true,
+        subtasks: true,
       },
     });
 
-    // Add isCompleted field to response
     return {
       ...todo,
       isCompleted: todo.completed,
@@ -227,13 +221,12 @@ export async function createTodo(data: CreateTodoParams) {
   }
 }
 
-// PUT - Update todo
 export async function updateTodo(id: string, data: UpdateTodoParams) {
   try {
     const session = await getSession();
     if (!session || !session.user) {
       throw new Error("Unauthorized: No session found");
-    } // Prepare update data
+    }
     const updateData: {
       updatedAt: Date;
       title?: string;
@@ -244,9 +237,10 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
       dueDate?: Date | null;
       category?: string;
       order?: number;
+      listId?: string | null;
     } = {
       updatedAt: new Date(),
-    }; // Add individual fields if provided
+    };
     if (data.title !== undefined) updateData.title = data.title;
     if (data.description !== undefined)
       updateData.description = data.description;
@@ -256,16 +250,19 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
       updateData.isImportant = data.isImportant;
     if (data.dueDate !== undefined) updateData.dueDate = data.dueDate;
     if (data.order !== undefined) updateData.order = data.order;
-
+    if (data.listId !== undefined) updateData.listId = data.listId;
     const todo = await db.task.update({
       where: {
         id,
-        creatorId: session.user.id, // Only update user's own todos
+        creatorId: session.user.id,
       },
       data: updateData,
+      include: {
+        list: true,
+        subtasks: true,
+      },
     });
 
-    // Add isCompleted field to response
     return {
       ...todo,
       isCompleted: todo.completed,
@@ -276,7 +273,6 @@ export async function updateTodo(id: string, data: UpdateTodoParams) {
   }
 }
 
-// PATCH - Mark as complete/incomplete
 export async function toggleTodoComplete(id: string) {
   try {
     const session = await getSession();
@@ -287,7 +283,7 @@ export async function toggleTodoComplete(id: string) {
     const currentTodo = await db.task.findUnique({
       where: {
         id,
-        creatorId: session.user.id, // Only access user's own todos
+        creatorId: session.user.id,
       },
     });
 
@@ -298,7 +294,7 @@ export async function toggleTodoComplete(id: string) {
     const todo = await db.task.update({
       where: {
         id,
-        creatorId: session.user.id, // Only update user's own todos
+        creatorId: session.user.id,
       },
       data: {
         completed: !currentTodo.completed,
@@ -306,7 +302,6 @@ export async function toggleTodoComplete(id: string) {
       },
     });
 
-    // Add isCompleted field to response
     return {
       ...todo,
       isCompleted: todo.completed,
@@ -317,7 +312,6 @@ export async function toggleTodoComplete(id: string) {
   }
 }
 
-// DELETE - Delete todo
 export async function deleteTodo(id: string) {
   try {
     const session = await getSession();
@@ -328,7 +322,7 @@ export async function deleteTodo(id: string) {
     await db.task.delete({
       where: {
         id,
-        creatorId: session.user.id, // Only delete user's own todos
+        creatorId: session.user.id,
       },
     });
 

@@ -18,6 +18,7 @@ export async function createTodoAPI(data: {
   dueDate?: string | null;
   isUrgent?: boolean;
   isImportant?: boolean;
+  listId?: string | null;
 }) {
   const response = await fetch(API_BASE, {
     method: "POST",
@@ -40,6 +41,7 @@ export async function updateTodoAPI(
     isImportant?: boolean;
     completed?: boolean;
     order?: number;
+    listId?: string | null;
   }
 ) {
   const response = await fetch(`${API_BASE}/${id}`, {

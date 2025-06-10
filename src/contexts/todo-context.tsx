@@ -15,27 +15,31 @@ import {
   toggleTodoCompleteAPI,
 } from "@/lib/api/client";
 
-// Extended Task type with isCompleted field
 export interface TodoItem extends Task {
   isCompleted: boolean;
+  list?: {
+    id: string;
+    title: string;
+    color?: string;
+    description?: string;
+  } | null;
   subtasks?: Array<Subtask & { isCompleted: boolean }>;
 }
 
-// Helper function to calculate quadrant from isUrgent and isImportant
 export function calculateQuadrant(
   isUrgent: boolean,
   isImportant: boolean
 ): string {
   if (isUrgent && isImportant) {
-    return "1"; // Urgent & Important
+    return "1";
   }
   if (!isUrgent && isImportant) {
-    return "2"; // Important & Not Urgent
+    return "2";
   }
   if (isUrgent && !isImportant) {
-    return "3"; // Urgent & Not Important
+    return "3";
   }
-  return "4"; // Neither Urgent nor Important
+  return "4";
 }
 
 interface CreateTodoData {
@@ -44,6 +48,7 @@ interface CreateTodoData {
   dueDate?: string | null;
   isUrgent?: boolean;
   isImportant?: boolean;
+  listId?: string | null;
 }
 
 interface UpdateTodoData {
@@ -52,6 +57,7 @@ interface UpdateTodoData {
   dueDate?: string | null;
   isUrgent?: boolean;
   isImportant?: boolean;
+  listId?: string | null;
   completed?: boolean;
   order?: number;
 }
@@ -101,7 +107,6 @@ export function TodoProvider({
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filterToday, setFilterToday] = useState(false);
-  // Initial data loading
   const refreshTodos = useCallback(
     async (options?: {
       sortBy?: "order" | "dueDate" | "createdAt";
@@ -112,7 +117,6 @@ export function TodoProvider({
         setLoading(true);
         setError(null);
 
-        // Use provided options or fall back to state values
         const sortByValue = options?.sortBy || sortBy;
         const sortOrderValue = options?.sortOrder || sortOrder;
         const filterTodayValue =
@@ -120,13 +124,11 @@ export function TodoProvider({
             ? options.filterToday
             : filterToday;
 
-        // Update state if options are provided
         if (options?.sortBy) setSortBy(options.sortBy);
         if (options?.sortOrder) setSortOrder(options.sortOrder);
         if (options?.filterToday !== undefined)
           setFilterToday(options.filterToday);
 
-        // Build query string
         const params = new URLSearchParams();
         if (searchTerm) params.append("search", searchTerm);
         if (sortByValue !== "order") params.append("sortBy", sortByValue);
@@ -141,7 +143,6 @@ export function TodoProvider({
         const data = await response.json();
 
         if (data.success) {
-          // API returns todos with quadrant and isCompleted fields
           setTodos(data.data as TodoItem[]);
         } else {
           throw new Error(data.error);
@@ -166,7 +167,6 @@ export function TodoProvider({
       setError(null);
       const response = await createTodoAPI(data);
       if (response.success) {
-        // API returns todo with quadrant and isCompleted fields
         setTodos((prev) => [...prev, response.data as TodoItem]);
       } else {
         throw new Error(response.error);
@@ -182,7 +182,6 @@ export function TodoProvider({
       setError(null);
       const response = await updateTodoAPI(id, data);
       if (response.success) {
-        // API returns updated todo with quadrant and isCompleted fields
         setTodos((prev) =>
           prev.map((todo) =>
             todo.id === id ? ({ ...todo, ...response.data } as TodoItem) : todo
@@ -218,7 +217,6 @@ export function TodoProvider({
       setError(null);
       const response = await toggleTodoCompleteAPI(id);
       if (response.success) {
-        // API returns updated todo with quadrant and isCompleted fields
         setTodos((prev) =>
           prev.map((todo) =>
             todo.id === id
@@ -239,7 +237,6 @@ export function TodoProvider({
       throw err;
     }
   };
-  // Update subtasks for a specific todo without refreshing entire context
   const updateTodoSubtasks = (
     todoId: string,
     subtasks: Array<Subtask & { isCompleted: boolean }>
@@ -262,7 +259,6 @@ export function TodoProvider({
     );
   };
 
-  // Refresh todos when search term, sort options, or filter options change
   useEffect(() => {
     refreshTodos();
   }, [searchTerm, sortBy, sortOrder, filterToday, refreshTodos]);

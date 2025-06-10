@@ -1,4 +1,4 @@
-import Categories from "@/components/categories";
+import CategoriesWithLists from "@/components/categories-with-lists";
 import SearchForm from "@/components/search-form";
 import SortFilterOptions from "@/components/sort-filter-options";
 import { Grid, List } from "lucide-react";
@@ -12,19 +12,28 @@ interface DashboardPageProps {
     sortOrder?: string;
     filterDate?: string;
     showOnlyToday?: string;
+    filterList?: string;
   }>;
 }
 
 export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
-  const { search, view, sortBy, sortOrder, filterDate, showOnlyToday } =
-    await searchParams;
+  const {
+    search,
+    view,
+    sortBy,
+    sortOrder,
+    filterDate,
+    showOnlyToday,
+    filterList,
+  } = await searchParams;
   const currentSearch = search || "";
   const currentView = (view || "matrix") as "matrix" | "list";
   const currentSortBy = sortBy || "order";
   const currentSortOrder = sortOrder || "asc";
   const showTodayOnly = showOnlyToday === "true";
+  const currentFilterList = filterList;
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -39,9 +48,10 @@ export default async function DashboardPage({
             currentSortOrder={currentSortOrder}
             currentFilterDate={filterDate}
             showOnlyToday={showTodayOnly}
+            currentFilterList={currentFilterList}
           />
           <div className="min-h-[calc(100vh-250px)]">
-            <Categories
+            <CategoriesWithLists
               show={currentView}
               sortBy={
                 currentSortBy === "createdAt"
@@ -50,6 +60,7 @@ export default async function DashboardPage({
               }
               sortOrder={currentSortOrder as "asc" | "desc"}
               filterToday={showTodayOnly}
+              filterList={currentFilterList}
             />
           </div>
         </div>

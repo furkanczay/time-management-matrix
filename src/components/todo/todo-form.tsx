@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { useTodos, TodoItem, calculateQuadrant } from "@/contexts/todo-context";
+import { ListSelector } from "@/components/list-selector";
 import { toast } from "sonner";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -50,6 +51,7 @@ const formSchema = z.object({
   }),
   dueDate: z.date().optional(),
   completed: z.boolean().optional(),
+  listId: z.string().nullable().optional(),
 });
 export default function TodoForm({
   todo,
@@ -71,6 +73,7 @@ export default function TodoForm({
         ? calculateQuadrant(todo.isUrgent, todo.isImportant)
         : "",
       dueDate: todo?.dueDate ? new Date(todo.dueDate) : undefined,
+      listId: todo?.listId || null,
     },
   });
   const { createTodo, updateTodo } = useTodos();
@@ -85,6 +88,7 @@ export default function TodoForm({
           isUrgent,
           isImportant,
           dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+          listId: values.listId || null,
         });
         toast.success("Todo updated successfully!");
       } else {
@@ -93,6 +97,7 @@ export default function TodoForm({
           isUrgent,
           isImportant,
           dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+          listId: values.listId || null,
         });
         toast.success("Todo created successfully!");
       }
@@ -101,6 +106,7 @@ export default function TodoForm({
         todo: "",
         category: initCategory || "",
         dueDate: undefined,
+        listId: null,
       });
 
       if (onSuccess) onSuccess();
@@ -212,7 +218,21 @@ export default function TodoForm({
               </FormItem>
             )}
           />
-        </div>{" "}
+        </div>
+
+        {/* List Selector */}
+        <FormField
+          control={form.control}
+          name="listId"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <ListSelector value={field.value} onChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
         {/* Submit Button */}
         <div className="flex justify-end">
           <Button type="submit" className="w-full md:w-auto">
