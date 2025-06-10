@@ -113,12 +113,12 @@ export default function SortFilterOptions({
     !!currentFilterList ||
     showOnlyToday;
   return (
-    <div className="glass-effect rounded-xl p-4 border shadow-sm">
-      <div className="flex flex-wrap items-center gap-3">
+    <div className="glass-effect rounded-xl p-3 sm:p-4 border shadow-sm">
+      <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
         {/* Sort Controls */}
-        <div className="flex items-center bg-muted/30 backdrop-blur-sm rounded-lg p-1 border border-border/30">
+        <div className="flex items-center bg-muted/30 backdrop-blur-sm rounded-lg p-1 border border-border/30 w-full sm:w-auto">
           <Select value={currentSortBy} onValueChange={handleSortByChange}>
-            <SelectTrigger className="w-[130px] border-0 bg-transparent focus:ring-0 h-8">
+            <SelectTrigger className="flex-1 sm:w-[130px] border-0 bg-transparent focus:ring-0 h-8">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="border border-border/50 shadow-lg">
@@ -131,7 +131,7 @@ export default function SortFilterOptions({
           <Button
             variant="ghost"
             size="sm"
-            className="ml-1 h-8 w-8 p-0 hover:bg-background/50 transition-colors"
+            className="ml-1 h-8 w-8 p-0 hover:bg-background/50 transition-colors shrink-0"
             onClick={() =>
               handleSortOrderChange(currentSortOrder === "asc" ? "desc" : "asc")
             }
@@ -145,23 +145,25 @@ export default function SortFilterOptions({
         </div>
 
         {/* Filter Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={selectedDate ? "default" : "outline"}
                 className={cn(
-                  "pl-3 pr-2 justify-between h-9 bg-background/50 border-border/50 hover:bg-background transition-all duration-200",
+                  "w-full sm:w-auto pl-3 pr-2 justify-between h-9 bg-background/50 border-border/50 hover:bg-background transition-all duration-200",
                   !selectedDate && "text-muted-foreground",
                   selectedDate &&
                     "bg-primary text-primary-foreground hover:bg-primary/90"
                 )}
                 size="sm"
               >
-                {selectedDate
-                  ? format(selectedDate, "MMM dd, yyyy")
-                  : "Filter by date"}
-                <CalendarIcon className="ml-2 h-4 w-4" />
+                <span className="truncate">
+                  {selectedDate
+                    ? format(selectedDate, "MMM dd, yyyy")
+                    : "Filter by date"}
+                </span>
+                <CalendarIcon className="ml-2 h-4 w-4 shrink-0" />
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -184,10 +186,12 @@ export default function SortFilterOptions({
               handleListFilter(value === "all" ? null : value)
             }
           >
-            <SelectTrigger className="w-[160px] h-9 bg-background/50 border-border/50 hover:bg-background transition-all duration-200">
-              <div className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4" />
-                <SelectValue placeholder="Filter by list" />
+            <SelectTrigger className="w-full sm:w-[160px] h-9 bg-background/50 border-border/50 hover:bg-background transition-all duration-200">
+              <div className="flex items-center gap-2 min-w-0">
+                <FolderOpen className="h-4 w-4 shrink-0" />
+                <div className="truncate">
+                  <SelectValue placeholder="Filter by list" />
+                </div>
               </div>
             </SelectTrigger>
             <SelectContent className="border border-border/50 shadow-lg">
@@ -217,7 +221,7 @@ export default function SortFilterOptions({
                   </div>
                 </SelectItem>
               ))}
-            </SelectContent>
+            </SelectContent>{" "}
           </Select>{" "}
           {/* Today Filter */}
           <Button
@@ -225,7 +229,7 @@ export default function SortFilterOptions({
             size="sm"
             onClick={handleTodayToggle}
             className={cn(
-              "h-9 transition-all duration-200",
+              "w-full sm:w-auto h-9 transition-all duration-200",
               showOnlyToday
                 ? "bg-primary text-primary-foreground hover:bg-primary/90"
                 : "bg-background/50 border-border/50 hover:bg-background"
@@ -239,7 +243,7 @@ export default function SortFilterOptions({
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              className="h-9 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+              className="w-full sm:w-auto h-9 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
               <X className="w-4 h-4 mr-1" />
               Clear
@@ -249,7 +253,7 @@ export default function SortFilterOptions({
 
         {/* Active Filters Display */}
         {hasActiveFilters && (
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap w-full sm:w-auto">
             {currentSortBy !== "order" && (
               <Badge
                 variant="secondary"
@@ -286,15 +290,17 @@ export default function SortFilterOptions({
             {currentFilterList && (
               <Badge
                 variant="secondary"
-                className="text-xs bg-muted/50 hover:bg-muted transition-colors flex items-center gap-1 group"
+                className="text-xs bg-muted/50 hover:bg-muted transition-colors flex items-center gap-1 group max-w-full"
               >
-                <FolderOpen className="w-3 h-3" />
-                {currentFilterList === "ungrouped"
-                  ? "Ungrouped"
-                  : lists.find((l) => l.id === currentFilterList)?.title ||
-                    "Unknown List"}
+                <FolderOpen className="w-3 h-3 shrink-0" />
+                <span className="truncate">
+                  {currentFilterList === "ungrouped"
+                    ? "Ungrouped"
+                    : lists.find((l) => l.id === currentFilterList)?.title ||
+                      "Unknown List"}
+                </span>
                 <X
-                  className="w-3 h-3 cursor-pointer opacity-60 group-hover:opacity-100 transition-opacity"
+                  className="w-3 h-3 cursor-pointer opacity-60 group-hover:opacity-100 transition-opacity shrink-0"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleListFilter(null);

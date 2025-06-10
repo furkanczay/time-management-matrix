@@ -188,20 +188,40 @@ export default function TodoDetail({
                       </div>
                     </div>
                   </div>
-                </div>
+                </div>{" "}
                 {/* Enhanced Category Badge with Gradient */}
                 {quadrantInfo && (
-                  <div className="flex items-center justify-between">
-                    <Badge
-                      variant={quadrantInfo.badgeVariant}
-                      className="text-sm px-4 py-2 rounded-full"
-                    >
-                      <quadrantInfo.icon className="w-4 h-4 mr-2" />
-                      {quadrantInfo.title}
-                      <span className="ml-2 text-xs opacity-75">
-                        ({quadrantInfo.description})
-                      </span>
-                    </Badge>
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge
+                        variant={quadrantInfo.badgeVariant}
+                        className="text-sm px-4 py-2 rounded-full"
+                      >
+                        <quadrantInfo.icon className="w-4 h-4 mr-2" />
+                        {quadrantInfo.title}
+                        <span className="ml-2 text-xs opacity-75">
+                          ({quadrantInfo.description})
+                        </span>
+                      </Badge>
+
+                      {/* List Badge */}
+                      {todo.list && (
+                        <Badge
+                          variant="outline"
+                          className="text-sm px-3 py-2 rounded-full border-2"
+                          style={{
+                            borderColor: todo.list.color,
+                            color: todo.list.color,
+                          }}
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full mr-2"
+                            style={{ backgroundColor: todo.list.color }}
+                          />
+                          {todo.list.title}
+                        </Badge>
+                      )}
+                    </div>
 
                     {/* Due Date Badge */}
                     {todo.dueDate && dueDateUrgency && (

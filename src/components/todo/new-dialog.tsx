@@ -10,9 +10,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import TodoForm from "./todo-form";
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 
-export default function NewDialog({ catId }: { catId: string }) {
+interface NewDialogProps {
+  catId?: string;
+  children?: ReactNode;
+  triggerClassName?: string;
+  showTrigger?: boolean;
+}
+
+export default function NewDialog({
+  catId,
+  children,
+  triggerClassName = "p-0 border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group flex-shrink-0",
+  showTrigger = true,
+}: NewDialogProps) {
   const [open, setOpen] = useState<boolean>(false);
 
   // Get category title for display
@@ -26,25 +38,25 @@ export default function NewDialog({ catId }: { catId: string }) {
     return categories[id as keyof typeof categories] || "Unknown Category";
   };
 
+  const defaultTrigger = (
+    <Button variant="ghost" className={triggerClassName}>
+      <Plus className="h-3 w-3 text-gray-400 group-hover:text-gray-600" />
+      Add Task
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full h-10 border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group"
-        >
-          <Plus className="h-4 w-4 text-gray-400 group-hover:text-gray-600 mr-2" />
-          <span className="text-sm text-gray-500 group-hover:text-gray-700 font-medium">
-            Add Task
-          </span>
-        </Button>
+        {children || (showTrigger ? defaultTrigger : null)}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
           <DialogDescription>
-            Add a new task to {getCategoryTitle(catId)} category
+            {catId
+              ? `Add a new task to ${getCategoryTitle(catId)} category`
+              : "Add a new task to your matrix"}
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">

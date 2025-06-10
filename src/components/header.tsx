@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { UserNav } from "./user-nav";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import NewDialog from "./todo/new-dialog";
 import {
   GridIcon,
   ClockIcon,
@@ -62,20 +63,21 @@ export default async function Header() {
               </Link>
             </Button>
           </nav>
-        </div>
-
+        </div>{" "}
         {/* Right Side Actions */}
         <div className="flex items-center gap-3">
           {session && (
             <>
-              <Button
-                size="sm"
-                className="hidden sm:flex bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200 group"
-              >
-                <PlusIcon className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-200" />
-                New Task
-                <Sparkles className="ml-2 h-3 w-3 opacity-70" />
-              </Button>
+              <NewDialog showTrigger={false}>
+                <Button
+                  size="sm"
+                  className="hidden sm:flex bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200 group"
+                >
+                  <PlusIcon className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-200" />
+                  New Task
+                  <Sparkles className="ml-2 h-3 w-3 opacity-70" />
+                </Button>
+              </NewDialog>
               <div className="h-6 w-px bg-border/50"></div>
               <UserNav user={session.user} />
             </>

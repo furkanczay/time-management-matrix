@@ -24,45 +24,51 @@ const getDueDateUrgency = (dueDate: Date | null | string) => {
   const today = new Date();
   const due = new Date(dueDate);
   const daysUntilDue = differenceInDays(due, today);
+
   if (daysUntilDue < 0) {
-    // Overdue - red styling
+    // Overdue - simple red indicator
     return {
-      cardClass:
-        "border-red-200 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/20 shadow-red-100 dark:shadow-red-900/20",
-      dateClass: "text-red-600 dark:text-red-400 font-semibold",
-      prefix: "🔴 Overdue: ",
+      icon: "🔴",
+      text: "Overdue",
+      textClass: "text-red-600 dark:text-red-400 font-semibold text-xs",
+      badgeClass:
+        "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     };
   } else if (daysUntilDue === 0) {
-    // Due today - urgent styling
+    // Due today - urgent indicator
     return {
-      cardClass:
-        "border-orange-200 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/20 shadow-orange-100 dark:shadow-orange-900/20",
-      dateClass: "text-orange-600 dark:text-orange-400 font-semibold",
-      prefix: "⚡ Due today: ",
+      icon: "⚡",
+      text: "Today",
+      textClass: "text-orange-600 dark:text-orange-400 font-semibold text-xs",
+      badgeClass:
+        "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
     };
   } else if (daysUntilDue === 1) {
-    // Due tomorrow - warning styling
+    // Due tomorrow - warning indicator
     return {
-      cardClass:
-        "border-amber-200 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/20 shadow-amber-100 dark:shadow-amber-900/20",
-      dateClass: "text-amber-600 dark:text-amber-400 font-medium",
-      prefix: "📅 Due tomorrow: ",
+      icon: "📅",
+      text: "Tomorrow",
+      textClass: "text-amber-600 dark:text-amber-400 font-medium text-xs",
+      badgeClass:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
     };
   } else if (daysUntilDue <= 3) {
-    // Due in 2-3 days - caution styling
+    // Due in 2-3 days - caution indicator
     return {
-      cardClass:
-        "border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-950/30 dark:to-yellow-900/20 shadow-yellow-100 dark:shadow-yellow-900/20",
-      dateClass: "text-yellow-600 dark:text-yellow-400 font-medium",
-      prefix: `⏰ Due in ${daysUntilDue} days: `,
+      icon: "⏰",
+      text: `${daysUntilDue}d`,
+      textClass: "text-blue-600 dark:text-blue-400 font-medium text-xs",
+      badgeClass:
+        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     };
   }
 
+  // Future date - neutral indicator
   return {
-    cardClass:
-      "border-border/50 bg-gradient-to-r from-card to-card/95 hover:shadow-md",
-    dateClass: "text-muted-foreground",
-    prefix: "📅 ",
+    icon: "📅",
+    text: format(new Date(dueDate), "MMM dd"),
+    textClass: "text-muted-foreground text-xs",
+    badgeClass: "bg-muted/50 text-muted-foreground",
   };
 };
 
@@ -100,8 +106,7 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative flex flex-row items-center justify-between gap-3 p-4 shadow-sm border-0 transition-all duration-200 hover-lift hover:shadow-lg rounded-xl backdrop-blur-sm",
-        dueDateUrgency?.cardClass,
+        "group relative flex flex-row items-center justify-between gap-3 p-4 shadow-sm border-border/50 transition-all duration-200 hover-lift hover:shadow-lg rounded-xl backdrop-blur-sm bg-card/80",
         isCompleted && "opacity-60 scale-95",
         isDragging && "opacity-30 z-50 rotate-2 scale-105 shadow-xl"
       )}
@@ -181,31 +186,19 @@ export default function SingleTodo({ todo }: { todo: TodoItem }) {
                 <span>{todo.subtasks.length}</span>
               </div>
             </div>
-          )}
-
-          {/* Due Date */}
-          {todo.dueDate && (
+          )}{" "}
+          {/* Due Date - Minimal Badge */}
+          {todo.dueDate && dueDateUrgency && (
             <div
               className={cn(
-                "flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-all duration-200",
-                dueDateUrgency?.dateClass || "text-muted-foreground",
-                dueDateUrgency?.cardClass.includes("red") &&
-                  "bg-red-50 dark:bg-red-950/20",
-                dueDateUrgency?.cardClass.includes("orange") &&
-                  "bg-orange-50 dark:bg-orange-950/20",
-                dueDateUrgency?.cardClass.includes("amber") &&
-                  "bg-amber-50 dark:bg-amber-950/20",
-                dueDateUrgency?.cardClass.includes("yellow") &&
-                  "bg-yellow-50 dark:bg-yellow-950/20",
-                !dueDateUrgency?.cardClass.includes("red") &&
-                  !dueDateUrgency?.cardClass.includes("orange") &&
-                  !dueDateUrgency?.cardClass.includes("amber") &&
-                  !dueDateUrgency?.cardClass.includes("yellow") &&
-                  "bg-muted/30"
+                "flex items-center gap-1 text-xs px-2 py-1 rounded-md font-medium transition-all duration-200 border",
+                dueDateUrgency.badgeClass
               )}
             >
-              <Calendar className="h-3 w-3" />
-              <span>{format(new Date(todo.dueDate), "MMM dd")}</span>
+              <span className="text-xs">{dueDateUrgency.icon}</span>
+              <span className={dueDateUrgency.textClass}>
+                {dueDateUrgency.text}
+              </span>
             </div>
           )}
         </div>

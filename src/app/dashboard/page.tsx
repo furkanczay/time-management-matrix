@@ -40,9 +40,11 @@ export default async function DashboardPage({
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="space-y-6">
           {/* Header Section */}
-          <div className="glass-effect rounded-2xl p-6 border shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <SearchForm currentSearch={currentSearch} />
+          <div className="glass-effect rounded-2xl p-4 sm:p-6 border shadow-sm">
+            <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div className="flex-1 max-w-md">
+                <SearchForm currentSearch={currentSearch} />
+              </div>
               <ViewToggle currentView={currentView} />
             </div>
           </div>

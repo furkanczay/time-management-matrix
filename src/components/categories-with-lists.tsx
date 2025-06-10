@@ -36,6 +36,8 @@ const QUADRANTS = [
     gradient: "quadrant-gradient-urgent",
     icon: "🔥",
     color: "text-red-600 dark:text-red-400",
+    bgColor:
+      "bg-red-50/60 dark:bg-red-950/30 border-red-200/40 dark:border-red-800/50",
   },
   {
     id: "2",
@@ -44,6 +46,8 @@ const QUADRANTS = [
     gradient: "quadrant-gradient-important",
     icon: "📅",
     color: "text-amber-600 dark:text-amber-400",
+    bgColor:
+      "bg-amber-50/60 dark:bg-amber-950/30 border-amber-200/40 dark:border-amber-800/50",
   },
   {
     id: "3",
@@ -52,6 +56,8 @@ const QUADRANTS = [
     gradient: "quadrant-gradient-delegate",
     icon: "👥",
     color: "text-blue-600 dark:text-blue-400",
+    bgColor:
+      "bg-blue-50/60 dark:bg-blue-950/30 border-blue-200/40 dark:border-blue-800/50",
   },
   {
     id: "4",
@@ -60,6 +66,8 @@ const QUADRANTS = [
     gradient: "quadrant-gradient-eliminate",
     icon: "🗑️",
     color: "text-gray-600 dark:text-gray-400",
+    bgColor:
+      "bg-gray-50/60 dark:bg-gray-950/30 border-gray-200/40 dark:border-gray-800/50",
   },
 ];
 
@@ -154,38 +162,35 @@ function ListSection({
       return sortOrder === "desc" ? b.order - a.order : a.order - b.order;
     }
   });
+
   return (
-    <div className="mb-4 animate-slide-in">
+    <div className="mb-4">
       <div
-        className="flex items-center gap-3 p-3 rounded-xl border bg-gradient-to-r from-card/50 to-card cursor-pointer hover:from-card hover:to-card/80 transition-all duration-200 hover:shadow-md group"
+        className="flex items-center gap-2 p-2 rounded-lg border bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
         onClick={onToggleCollapse}
       >
         <div
-          className="w-3 h-3 rounded-full shadow-sm ring-1 ring-white/20"
+          className="w-3 h-3 rounded-full"
           style={{ backgroundColor: list.color }}
         />
         {list.id === "ungrouped" ? (
-          <ListIcon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+          <ListIcon className="w-4 h-4 text-muted-foreground" />
         ) : (
-          <FolderOpen className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+          <FolderOpen className="w-4 h-4 text-muted-foreground" />
         )}
-        <span className="font-medium text-sm group-hover:text-foreground transition-colors">
-          {list.title}
-        </span>
-        <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-          {todos.length}
-        </span>
+        <span className="font-medium text-sm">{list.title}</span>
+        <span className="text-xs text-muted-foreground">({todos.length})</span>
         <div className="ml-auto">
           {isCollapsed ? (
-            <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-all duration-200" />
+            <ChevronDown className="w-4 h-4" />
           ) : (
-            <ChevronUp className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-all duration-200" />
+            <ChevronUp className="w-4 h-4" />
           )}
         </div>
       </div>
 
       {!isCollapsed && (
-        <div className="mt-3 space-y-2 ml-4 animate-slide-up">
+        <div className="mt-2 space-y-2 ml-4">
           <SortableContext
             items={sortedTodos.map((todo) => todo.id)}
             strategy={verticalListSortingStrategy}
@@ -249,7 +254,7 @@ export default function CategoriesWithLists({
 
   if (show === "matrix") {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+      <div className="grid grid-cols-1 gap-6 h-full">
         {QUADRANTS.map((quadrant) => {
           const filteredTodos = todos.filter((todo) => {
             const todoQuadrant = calculateQuadrant(
@@ -283,49 +288,49 @@ export default function CategoriesWithLists({
           return (
             <DroppableQuadrant key={quadrant.id} quadrant={quadrant.id}>
               <Card
-                className={`h-full flex flex-col hover-lift border-0 shadow-sm hover:shadow-lg transition-all duration-300 ${quadrant.gradient}`}
+                className={`h-full flex flex-col hover-lift border-0 shadow-sm hover:shadow-lg transition-all duration-300 ${quadrant.bgColor} overflow-hidden`}
               >
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                <CardHeader className="pb-2 px-2 pt-2 flex-shrink-0">
+                  <div className="flex items-center justify-between w-full gap-1">
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
                       <span
-                        className="text-2xl"
+                        className="text-lg flex-shrink-0"
                         role="img"
                         aria-label={quadrant.title}
                       >
                         {quadrant.icon}
                       </span>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <CardTitle
-                          className={`text-lg font-semibold ${quadrant.color}`}
+                          className={`text-sm font-semibold ${quadrant.color} truncate leading-tight`}
                         >
                           {quadrant.title}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground font-medium">
+                        <p className="text-xs text-muted-foreground font-medium truncate">
                           {quadrant.description}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
                       <NewDialog catId={quadrant.id} />
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="h-8 w-8 p-0 hover:bg-white/20 dark:hover:bg-black/20"
+                        className="p-0 border border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group flex-shrink-0"
                         onClick={() => toggleQuadrantCollapse(quadrant.id)}
                       >
                         {isCollapsed ? (
-                          <ChevronDown className="h-4 w-4" />
+                          <ChevronDown className="h-3 w-3" />
                         ) : (
-                          <ChevronUp className="h-4 w-4" />
+                          <ChevronUp className="h-3 w-3" />
                         )}
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="flex-1 overflow-auto scrollbar-thin">
+                <CardContent className="flex-1 overflow-auto">
                   {!isCollapsed && (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {Object.entries(groupedTodos)
                         .sort(([a], [b]) => {
                           // Sort ungrouped first, then by list title
@@ -396,95 +401,119 @@ export default function CategoriesWithLists({
             allGroupedTodos[b].list.title
           );
         })
-        .map(([listId, listData]) => (
-          <Card
-            key={listId}
-            className="hover-lift border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-r from-card to-card/95"
-          >
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-4 h-4 rounded-full shadow-sm ring-1 ring-white/20"
-                    style={{ backgroundColor: listData.list.color }}
-                  />
-                  <div className="flex-1">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      {listData.list.id === "ungrouped" ? (
-                        <ListIcon className="w-5 h-5 text-muted-foreground" />
-                      ) : (
-                        <FolderOpen className="w-5 h-5 text-muted-foreground" />
+        .map(([listId, listData]) => {
+          // Get a subtle background color based on list color
+          const getListBgColor = (color: string) => {
+            // Convert hex to RGB and add transparency
+            const hex = color.replace("#", "");
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return `rgba(${r}, ${g}, ${b}, 0.05)`;
+          };
+
+          const getBorderColor = (color: string) => {
+            const hex = color.replace("#", "");
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return `rgba(${r}, ${g}, ${b}, 0.2)`;
+          };
+
+          return (
+            <Card
+              key={listId}
+              className="hover-lift transition-all duration-300"
+              style={{
+                backgroundColor:
+                  listId !== "ungrouped"
+                    ? getListBgColor(listData.list.color)
+                    : undefined,
+                borderColor:
+                  listId !== "ungrouped"
+                    ? getBorderColor(listData.list.color)
+                    : undefined,
+              }}
+            >
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: listData.list.color }}
+                    />
+                    <div>
+                      <CardTitle className="text-lg">
+                        {listData.list.title}
+                      </CardTitle>
+                      {listData.list.description && (
+                        <p className="text-sm text-muted-foreground">
+                          {listData.list.description}
+                        </p>
                       )}
-                      {listData.list.title}
-                    </CardTitle>
-                    {listData.list.description && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {listData.list.description}
-                      </p>
-                    )}
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      ({listData.todos.length} tasks)
+                    </span>
                   </div>
-                  <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full font-medium">
-                    {listData.todos.length} tasks
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 hover:bg-muted/50"
-                  onClick={() => toggleListCollapse(listId, "list-view")}
-                >
-                  {collapsedLists.includes(`list-view-${listId}`) ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronUp className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </CardHeader>
-            {!collapsedLists.includes(`list-view-${listId}`) && (
-              <CardContent>
-                <div className="space-y-2">
-                  <SortableContext
-                    items={listData.todos.map((todo) => todo.id)}
-                    strategy={verticalListSortingStrategy}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleListCollapse(listId, "list-view")}
                   >
-                    {listData.todos
-                      .sort((a, b) => {
-                        // Sort logic here
-                        if (a.completed !== b.completed) {
-                          return a.completed ? 1 : -1;
-                        }
-
-                        if (sortBy === "dueDate") {
-                          if (!a.dueDate && !b.dueDate) return 0;
-                          if (!a.dueDate) return 1;
-                          if (!b.dueDate) return -1;
-
-                          const aDate = new Date(a.dueDate).getTime();
-                          const bDate = new Date(b.dueDate).getTime();
-                          return sortOrder === "desc"
-                            ? bDate - aDate
-                            : aDate - bDate;
-                        } else {
-                          return sortOrder === "desc"
-                            ? b.order - a.order
-                            : a.order - b.order;
-                        }
-                      })
-                      .map((todo) => (
-                        <SingleTodo key={todo.id} todo={todo} />
-                      ))}
-                  </SortableContext>
+                    {collapsedLists.includes(`list-view-${listId}`) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronUp className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-                {listData.todos.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No tasks in this list
-                  </p>
-                )}
-              </CardContent>
-            )}
-          </Card>
-        ))}
+              </CardHeader>
+              {!collapsedLists.includes(`list-view-${listId}`) && (
+                <CardContent>
+                  <div className="space-y-2">
+                    <SortableContext
+                      items={listData.todos.map((todo) => todo.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {listData.todos
+                        .sort((a, b) => {
+                          // Sort logic here
+                          if (a.completed !== b.completed) {
+                            return a.completed ? 1 : -1;
+                          }
+
+                          if (sortBy === "dueDate") {
+                            if (!a.dueDate && !b.dueDate) return 0;
+                            if (!a.dueDate) return 1;
+                            if (!b.dueDate) return -1;
+
+                            const aDate = new Date(a.dueDate).getTime();
+                            const bDate = new Date(b.dueDate).getTime();
+                            return sortOrder === "desc"
+                              ? bDate - aDate
+                              : aDate - bDate;
+                          } else {
+                            return sortOrder === "desc"
+                              ? b.order - a.order
+                              : a.order - b.order;
+                          }
+                        })
+                        .map((todo) => (
+                          <SingleTodo key={todo.id} todo={todo} />
+                        ))}
+                    </SortableContext>
+                  </div>
+                  {listData.todos.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No tasks in this list
+                    </p>
+                  )}
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
 
       {Object.keys(allGroupedTodos).length === 0 && (
         <Card>
