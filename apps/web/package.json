@@ -43,7 +43,8 @@
     "sonner": "^2.0.4",
     "tailwind-merge": "^3.3.0",
     "zod": "^3.25.46"
-  },  "devDependencies": {
+  },
+  "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@repo/eslint-config": "workspace:^",
     "@repo/typescript-config": "workspace:^",
